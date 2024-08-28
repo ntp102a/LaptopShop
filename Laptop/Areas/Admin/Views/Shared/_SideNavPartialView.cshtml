@@ -1,0 +1,58 @@
+﻿<div class="side-nav">
+    <div class="side-nav-inner">
+        <ul class="side-nav-menu scrollable">            
+            <li class="nav-item dropdown">
+                <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminProducts" asp-action="Index">
+                    <span class="icon-holder">
+                        <i class="anticon anticon-shopping-cart"></i>
+                    </span>
+                    <span class="title">Danh sách sản phẩm</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminUsers" asp-action="Index">
+                    <span class="icon-holder">
+                        <i class="anticon anticon-contacts"></i>
+                    </span>
+                    <span class="title">Quản lý Khách Hàng</span>
+
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminOrders" asp-action="Index">
+                    <span class="icon-holder">
+                        <i class="anticon anticon-file"></i>
+                    </span>
+                    <span class="title">Quản lý Đơn Hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminRevenue" asp-action="Index">
+                    <span class="icon-holder">
+                        <i class="anticon anticon-calculator"></i>
+                    </span>
+                    <span class="title">Quản lý Doanh Thu</span>
+                </a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="dropdown-toggle" href="javascript:void(0);">
+                    <span class="icon-holder">
+                        <i class="anticon anticon-table"></i>
+                    </span>
+                    <span class="title">Quản lý hệ thống</span>
+                    <span class="arrow">
+                        <i class="arrow-icon"></i>
+                    </span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a asp-area="Admin" asp-controller="AdminCategories" asp-action="Index">Danh mục sản phẩm</a>
+                    </li>
+                    <li>
+                        <a asp-area="Admin" asp-controller="AdminRoles" asp-action="Index">Quản lý quyền truy cập</a>
+                    </li>                    
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>

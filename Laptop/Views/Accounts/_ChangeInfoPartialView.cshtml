@@ -1,0 +1,29 @@
+﻿@model LaptopShop.ModelViews.ChangeInfoViewModel
+
+<div class="myaccount-details">
+    <form asp-controller="Accounts" asp-action="ChangeInfo" method="post" class="myaccount-form">
+        <div class="myaccount-form-inner">
+            <div class="single-input">
+                <label>Họ và tên</label>
+                <input asp-for="FullName" type="text" placeholder="Họ và tên" required>
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="single-input">
+                <label>Địa chỉ</label>
+                <input type="tel" asp-for="Address" placeholder="Địa chỉ" required>
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="single-input">
+                <label>Số điện thoại</label>
+                <input type="tel" asp-for="Phone" placeholder="Số điện thoại" required>
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="single-input">
+                <button class="btn btn-custom-size lg-size btn-secondary btn-primary-hover rounded-0" type="submit">
+                    <span>Lưu thay đổi</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+

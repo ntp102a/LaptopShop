@@ -1,0 +1,132 @@
+﻿@model LaptopShop.Models.Product
+
+@{
+    ViewData["Title"] = "Thông tin sản phẩm" + Model.ProductName;
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Home</a>
+            <a class="breadcrumb-item" asp-area="Admin" asp-controller="AdminProducts" asp-action="Index">Danh sách sản phẩm</a>
+            <span class="breadcrumb-item active">Thông tin sản phẩm : @Model.ProductName</span>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">Thông tin sản phẩm : @Model.ProductName</h4>
+        <div class="table-responsive">
+            <table class="product-info-table m-t-20">
+                <tbody>
+                    <tr>
+                        <td>ID:</td>
+                        <td class="text-dark font-weight-semibold">@Model.ProductId</td>
+                    </tr>
+                    <tr>
+                        <td>Tên sản phẩm:</td>
+                        <td>@Model.ProductName</td>
+                    </tr>
+                    <tr>
+                        <td>Giá bán:</td>
+                        <td>@Model.Price</td>
+                    </tr>
+                    <tr>
+                        <td>Mô tả:</td>
+                        <td>@Model.Description</td>
+                    </tr>
+                    <tr>
+                        <td>Giảm giá(%):</td>
+                        <td>@Model.Discount</td>
+                    </tr>
+                    <tr>
+                        <td>Ngày sản xuất:</td>
+                        <td>
+                            @if (Model.Info.Date.HasValue)
+                            {
+                                @Model.Info.Date.Value.ToString("dd/MM/yyyy")
+                            }
+                            else
+                            {
+                                <span>Không có dữ liệu</span>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Số lượng hàng:</td>
+                        <td>@Model.Instock</td>
+                    </tr>
+                    <tr>
+                        <td>Danh mục:</td>
+                        <td>@Model.Category.CategoryName</td>
+                    </tr>
+                    <tr>
+                        <td>Hình ảnh chính:</td>
+                        <td>
+                            <img width="200" height="200" src="~/images/products/@Model.Image.ImageThumb" alt="" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hình ảnh nhỏ 1:</td>
+                        <td>
+                            <img width="200" height="200" src="~/images/products/@Model.Image.Image1" alt="" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hình ảnh nhỏ 2:</td>
+                        <td>
+                            <img width="200" height="200" src="~/images/products/@Model.Image.Image2" alt="" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hình ảnh nhỏ 3:</td>
+                        <td>
+                            <img width="200" height="200" src="~/images/products/@Model.Image.Image3" alt="" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>CPU:</td>
+                        <td>@Model.Info.Cpu</td>
+                    </tr>
+                    <tr>
+                        <td>Ram:</td>
+                        <td>@Model.Info.Ram</td>
+                    </tr>
+                    <tr>
+                        <td>Hardware:</td>
+                        <td>@Model.Info.Hardware</td>
+                    </tr>
+                    <tr>
+                        <td>Screen:</td>
+                        <td>@Model.Info.Screen</td>
+                    </tr>
+                    <tr>
+                        <td>VGA:</td>
+                        <td>@Model.Info.Vga</td>
+                    </tr>
+                    <tr>
+                        <td>Cổng kết nối:</td>
+                        <td>@Model.Info.ConnectGate</td>
+                    </tr>
+                    <tr>
+                        <td>Hệ điều hành:</td>
+                        <td>@Model.Info.Os</td>
+                    </tr>
+                    <tr>
+                        <td>Thiết kế:</td>
+                        <td>@Model.Info.Design</td>
+                    </tr>
+                    <tr>
+                        <td>Kích thước:</td>
+                        <td>@Model.Info.Size</td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

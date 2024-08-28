@@ -1,0 +1,45 @@
+﻿@model LaptopShop.ModelViews.MuaHangSuccessVM
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@section Styles{
+    <style type="text/css">
+        .nice-select .list {
+            border-radius: 0px;
+            overflow-y: auto;
+            overflow: hidden;
+            max-height: 200px;
+            overflow-y: scroll;
+        }
+
+        .nice-select .option:hover, .nice-select .option.focus, .nice-select .option.selected.focus {
+            color: red;
+            background: none;
+        }
+    </style>
+}
+
+<main class="main-content">
+    <div class="checkout-area section-space-y-axis-100">
+        <div class="container">
+            <div class="col-lg-12 col-12" style="text-align: center;">
+                <img style="max-height: 120px; max-width:120px; display: inline-block" src="/assets/images/success.png" />
+                <h2>Đặt hàng thành công</h2>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div>
+                    <h3>THÔNG TIN ĐƠN HÀNG</h3>
+                    <p>Cảm ơn bạn đã đặt hàng</p>
+                    <p>Mã đơn hàng: #@Model.DonHangID</p>
+                    <p>Người nhận: @Model.FullName</p>
+                    <p>Số điện thoại: @Model.Phone</p>
+                    <p>Địa chỉ giao hàng: @Model.Address</p>
+                    <br />
+                    Để xem chi tiết đơn hàng vui lòng truy cập vào <a asp-controller="Accounts" asp-action="Dashboard"><strong>Tài khoản cá nhân.</strong></a> Cần hỗ trợ? Liên hệ với chúng tôi qua số điện thoại 0963102916
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

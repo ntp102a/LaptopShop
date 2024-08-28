@@ -1,0 +1,27 @@
+﻿@using LaptopShop.Models
+@model LaptopShop.Models.Product
+
+<div class="modal-body">
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Danh sách sản phẩm thuộc @Model.Category.CategoryName</h1>
+            <div class="table-responsive">
+                <table class="product-info-table m-t-20">
+                    <thead>
+                        <tr>
+                            <th>Tên sản phẩm</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ViewBag.Products)
+                        {
+                            <tr>
+                                <td>@item.ProductName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

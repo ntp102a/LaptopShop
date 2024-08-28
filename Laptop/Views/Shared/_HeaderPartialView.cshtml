@@ -1,0 +1,83 @@
+﻿<header>
+    <!-- TOP HEADER -->
+    <div id="top-header">
+        <div class="container">
+            <ul class="header-links pull-left">
+                <li><a href="#"><i class="fa fa-phone"></i>0336960995</a></li>
+                <li><a href="#"><i class="fa fa-envelope-o"></i>ntp1022k2@gmail.com</a></li>
+                <li><a href="#"><i class="fa fa-map-marker"></i>1 Võ Văn Ngân</a></li>
+            </ul>
+            <ul class="header-links pull-right">
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li><a class="dropdown-item" href="/tai-khoan-cua-toi.html">Tài khoản</a></li>
+                }
+                else
+                {
+                    <li><a class="dropdown-item" href="/dang-nhap.html">Đăng nhập</a></li>
+                    <li><a class="dropdown-item" href="/dang-ky.html">Đăng ký</a></li>
+
+                }
+            </ul>
+        </div>
+    </div>
+    <!-- /TOP HEADER -->
+    <!-- MAIN HEADER -->
+    <div id="header">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <!-- LOGO -->
+                <div class="col-md-3">
+                    <div class="header-logo">
+                        <a href="/" class="logo">
+                            <img src="/img/logo.png" alt="">
+                        </a>
+                    </div>
+                </div>
+                <!-- /LOGO -->
+                <!-- SEARCH BAR -->
+                <div class="col-md-6">
+                    <div class="header-search">
+                        <form>
+                            <select class="input-select" id="categorySelect">
+                                <!-- List categories lấy = js -->
+                            </select>
+                            <input id="keyword" name="keyword" class="input" placeholder="Tìm kiếm sản phẩm">
+                            <button class="search-btn" type="submit">Search</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- /SEARCH BAR -->
+                <!-- ACCOUNT -->
+                <div class="col-md-3 clearfix">
+                    <div class="header-ctn">
+                        <!-- Cart -->
+                        <div class="dropdown">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                @await Component.InvokeAsync("NumberCart")
+                                @await Component.InvokeAsync("HeaderCart")
+                            }
+                        </div>
+                        <!-- /Cart -->
+                        <!-- Menu Toogle -->
+                        <div class="menu-toggle">
+                            <a href="#">
+                                <i class="fa fa-bars"></i>
+                                <span>Menu</span>
+                            </a>
+                        </div>
+                        <!-- /Menu Toogle -->
+                    </div>
+                </div>
+                <!-- /ACCOUNT -->
+            </div>
+            <!-- row -->
+        </div>
+        <!-- container -->
+    </div>
+    <!-- /MAIN HEADER -->
+</header>

@@ -1,0 +1,65 @@
+﻿@model LaptopShop.Models.User
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Trang chủ</a>
+            <a class="breadcrumb-item" asp-area="Admin" asp-controller="AdminUsers" asp-action="Index">Danh sách người dùng</a>
+            <span class="breadcrumb-item active">Thêm mới người dùng</span>
+        </nav>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <tbody>
+                <tr>
+                    <td>Họ và tên:</td>
+                    <input asp-for="FullName" class="form-control" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Địa chỉ:</td>
+                    <input asp-for="Address" class="form-control" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Số điện thoại:</td>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Email:</td>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Mật khẩu:</td>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Vai trò:</td>
+                    <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </tr>
+                <br />
+            </tbody>
+            <tbody>
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </tbody>
+        </form>
+    </div>
+</div>
+

@@ -1,0 +1,156 @@
+﻿@model LaptopShop.Models.Product
+
+@{
+    ViewData["Title"] = "Thêm sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Home</a>s
+            <a class="breadcrumb-item" asp-area="Admin" asp-controller="AdminProducts" asp-action="Index">Danh sách sản phẩm</a>
+            <span class="breadcrumb-item active">Thêm sản phẩm</span>
+        </nav>
+    </div>
+</div>
+
+<form asp-controller="AdminProducts" asp-action="Create" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="page-header no-gutters has-tab">
+        <div class="d-md-flex m-b-15 align-items-center justify-content-between">
+            <div class="media align-items-center m-b-15">
+            </div>
+            <div class="m-b-15">
+                <button class="btn btn-primary">
+                    <i class="anticon anticon-save"></i>
+                    <span>Save</span>
+                </button>
+            </div>
+        </div>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#product-edit-basic">Thông tin cơ bản</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#product-edit-option">Thông tin sản phẩm</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#product-edit-description">Mô tả</a>
+            </li>
+        </ul>
+    </div>
+    <div class="tab-content m-t-15">
+        <div class="tab-pane fade show active" id="product-edit-basic">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="font-weight-semibold" for="productName">Tên sản phẩm</label>
+                        <input type="text" class="form-control" asp-for="@Model.ProductName">
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="productPrice">Giá bán</label>
+                            <input type="text" class="form-control" asp-for="@Model.Price">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="productPrice">Giảm giá (%)</label>
+                            <input type="text" class="form-control" asp-for="@Model.Discount">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="font-weight-semibold" for="productName">Ngày ra mắt</label>
+                        <input type="text" class="form-control" asp-for="@Model.Info.Date">
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="productCategory">Danh mục sản phẩm</label>
+                            <select class="custom-select" asp-for="@Model.CategoryId" style="min-width: 200px;" asp-items="ViewBag.CategoryId">
+                                <option value="" disabled selected>Chọn danh mục</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="productName">Số lượng</label>
+                            <input type="text" class="form-control" asp-for="@Model.Instock">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="font-weight-semibold" for="productBrand">Ảnh đại diện</label>
+                        <input name="fThumb" type="file" class="form-control-file" asp-for="@Model.Image.ImageThumb">
+                        <span asp-validation-for="@Model.Image.ImageThumb" class="text-danger"></span>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="font-weight-semibold" for="productBrand">Ảnh phụ 1</label>
+                            <input name="fimage1" type="file" class="form-control-file" asp-for="@Model.Image.Image1">
+                            <span asp-validation-for="@Model.Image.Image1" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-semibold" for="productBrand">Ảnh phụ 2</label>
+                            <input name="fimage2" type="file" class="form-control-file" asp-for="@Model.Image.Image2">
+                            <span asp-validation-for="@Model.Image.Image2" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-semibold" for="productBrand">Ảnh phụ 3</label>
+                            <input name="fimage3" type="file" class="form-control-file" asp-for="@Model.Image.Image3">
+                            <span asp-validation-for="@Model.Image.Image3" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="product-edit-option">
+            <div class="card">
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">CPU</label>
+                    <input type="text" class="form-control" asp-for="@Model.Info.Cpu">
+                </div>
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">RAM</label>
+                    <input type="text" class="form-control" asp-for="@Model.Info.Ram">
+                </div>
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">Ổ cứng</label>
+                    <input type="text" class="form-control" asp-for="@Model.Info.Hardware">
+                </div>
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">Màn hình</label>
+                    <input type="text" class="form-control" asp-for="@Model.Info.Screen">
+                </div>
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">Card đồ hoạ</label>
+                    <input type="text" class="form-control" asp-for="@Model.Info.Vga">
+                </div>
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">Cổng kết nối</label>
+                    <input type="text" class="form-control" asp-for="@Model.Info.ConnectGate">
+                </div>
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">Hệ điều hành</label>
+                    <input type="text" class="form-control" asp-for="@Model.Info.Os">
+                </div>
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">Thiết kế</label>
+                    <input type="text" class="form-control" asp-for="@Model.Info.Design">
+                </div>
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">Kích thước</label>
+                    <input type="text" class="form-control" asp-for="@Model.Info.Size">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="product-edit-description">
+            <div class="card">
+                <div class="card-body">
+                    <label class="font-weight-semibold" for="productName">Mô tả sản phẩm</label>
+                    <input type="text" class="form-control" asp-for="@Model.Description">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+

@@ -1,0 +1,78 @@
+﻿@model LaptopShop.ModelViews.OrderViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Trang chủ</a>
+            <a class="breadcrumb-item" asp-area="Admin" asp-controller="AdminOrders" asp-action="Index">Danh sách đơn hàng</a>
+            <span class="breadcrumb-item active">Chỉnh sửa đơn hàng: @Model.OrderId</span>
+        </nav>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="OrderId" />
+            <tbody>
+                <tr>
+                    <td>Người nhận:</td>
+                    <input asp-for="RecipientName" class="form-control" />
+                    <span asp-validation-for="RecipientName" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Địa chỉ:</td>
+                    <input asp-for="Address" class="form-control" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Số điện thoại:</td>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Ngày mua hàng:</td>
+                    <input asp-for="OrderDate" class="form-control" type="datetime-local"/>
+                    <span asp-validation-for="OrderDate" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Ghi chú :</td>
+                    <input asp-for="Note" class="form-control" />
+                    <span asp-validation-for="Note" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Người đặt:</td>
+                    <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Trạng thái:</td>
+                    <select asp-for="StatusId" class="form-control" asp-items="ViewBag.StatusId"></select>
+                    <span asp-validation-for="StatusId" class="text-danger"></span>
+                </tr>
+                <br />
+                <tr>
+                    <td>Tổng tiền :</td>
+                    <input asp-for="Total" class="form-control" />
+                    <span asp-validation-for="Total" class="text-danger"></span>
+                </tr>
+                <br />
+            </tbody>
+            <tbody>
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </tbody>
+        </form>
+    </div>
+</div>
+

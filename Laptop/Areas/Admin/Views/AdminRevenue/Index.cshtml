@@ -1,0 +1,444 @@
+﻿@model LaptopShop.Models.Order
+
+@{
+    ViewData["Title"] = "Quản Lý Doanh Thu";
+    int TotalMoney = ViewBag.TotalSum;
+    int TotalOrders = ViewBag.TotalOrders;
+    int TotalOrdersUser = ViewBag.TotalOrdersUser;
+    var monthlyData = ViewBag.MonthlyData as List<dynamic>;
+}
+
+<div class="page-header">
+
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Home</a>
+            <span class="breadcrumb-item active">Quản Lý Doanh Thu</span>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <!-- Page Container START -->
+        <div class="container">
+            <!-- Content Wrapper START -->
+            <div class="main-content">
+                <div class="row">
+                    <div class="col-md-3">
+                        <!-- Thẻ chọn năm -->
+                        <div class="form-group">
+                            <label for="yearSelect">Chọn năm:</label>
+                            <select id="yearSelect" class="form-control">
+                                @for (int year = DateTime.Now.Year; year >= 2000; year--)
+                                {
+                                    <option value="@year">@year</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Thẻ chọn tháng -->
+                        <div class="form-group month-select">
+                            <label for="monthSelect">Chọn tháng:</label>
+                            <select id="monthSelect" class="form-control">
+                                @for (int month = 1; month <= 12; month++)
+                                {
+                                    <option value="@month">@month</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Thẻ chọn tháng -->
+                        <div class="form-group">
+                            <label for="chartTypeSelect">Chọn loại biểu đồ:</label>
+                            <select id="chartTypeSelect" class="form-control">
+                                <option value="bar">Bar Chart</option>
+                                <option value="line">Line Chart</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Nút xuất dữ liệu -->
+                        <div class="form-group">
+                            <label for="exportButton" style="visibility: hidden;">Label ẩn</label>
+                            <button id="exportButton" class="btn btn-primary btn-block">Thống Kê</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="media align-items-center">
+                                    <div class="avatar avatar-icon avatar-lg avatar-blue">
+                                        <i class="anticon anticon-dollar"></i>
+                                    </div>
+                                    <div class="m-l-5">
+                                        <p class="m-b-0 text-muted">Tổng doanh thu trong năm </p>
+                                        <h2 class="m-b-0" id="totalRevenueInYear">0 VNĐ</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="media align-items-center">
+                                    <div class="avatar avatar-icon avatar-lg avatar-gold">
+                                        <i class="anticon anticon-profile"></i>
+                                    </div>
+                                    <div class="m-l-10">
+                                        <p class="m-b-0 text-muted">Tổng đơn hàng</p>
+                                        <h2 class="m-b-0">@TotalOrders</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="media align-items-center">
+                                    <div class="avatar avatar-icon avatar-lg avatar-purple">
+                                        <i class="anticon anticon-user"></i>
+                                    </div>
+                                    <div class="m-l-15">
+                                        <p class="m-b-0 text-muted">Tổng khách hàng</p>
+                                        <h2 class="m-b-0">@TotalOrdersUser</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="media align-items-center">
+                                    <div class="avatar avatar-icon avatar-lg avatar-blue">
+                                        <i class="anticon anticon-dollar"></i>
+                                    </div>
+                                    <div class="m-l-5">
+                                        <p class="m-b-0 text-muted">Tổng doanh thu trong tháng</p>
+                                        <h2 class="m-b-0" id="totalRevenueInMonth">0 VNĐ</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <canvas id="revenueChart" width="800" height="400"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Content Wrapper END -->
+        </div>
+        <!-- Page Container END -->
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    function setupExportButton() {
+        var exportButton = document.getElementById('exportButton');
+        exportButton.addEventListener('click', function () {
+            var year = document.getElementById('yearSelect').value;
+            var month = document.getElementById('monthSelect').value;
+            var chartType = document.getElementById('chartTypeSelect').value; 
+
+            fetch(`/Admin/AdminRevenue/ExportData?year=${year}&month=${month}&chartType=${chartType}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('isEmpty:', data.isEmpty);
+                    if (data && data.hasOwnProperty('isEmpty') && typeof data.isEmpty === 'boolean') {
+                        if (data.isEmpty) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Thông Báo',
+                                text: 'Tháng này chưa có doanh thu !!!',
+                            });
+                        } else {
+                            drawChart(data, chartType, data.monthlyData);
+                        }
+                    } else {
+                        console.error('Invalid data format from server');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    console.error('Error details:', error.message, error.response);
+                });
+        });
+    }
+
+    function drawChart(data, chartType, monthlyData) {
+        console.log('Data from Controller:', data);
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+        var chartData;
+
+        if (chartType === 'bar') {
+            chartData = prepareChartData(data, monthlyData);
+        } else if (chartType === 'line') {
+            chartData = prepareLineChartData(data, monthlyData);
+        } else {
+            console.error('Invalid chartType:', chartType);
+            return;
+        }
+
+        var { labels, values, totalRevenueInMonth, totalRevenueInYear, monthlyData } = chartData;
+
+        console.log("Tháng :", totalRevenueInMonth);
+        console.log("Năm :", totalRevenueInYear);
+
+        // Destroy existing chart if it exists
+        if (window.revenueChart && typeof window.revenueChart.destroy === 'function') {
+            window.revenueChart.destroy();
+        }
+
+        // Create a new Chart object for either bar or line chart
+        if (chartType === 'bar') {
+            window.revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh Thu',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 0.5,
+                        data: values,
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMin: 0,
+                            ticks: {
+                                stepSize: 10000 // Bước giảm/giữa các giá trị trục y
+                            }
+                        },
+                        x: {
+                            suggestedMin: 0,
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            // Cập nhật tổng doanh thu 
+            updateTotalRevenueInMonth(totalRevenueInMonth);
+            updateTotalRevenueInYear(totalRevenueInYear);
+        } else if (chartType === 'line') {
+            // Create a new Chart object for the line chart
+            window.revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh Thu',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        pointRadius: 5, // Set the point radius
+                        pointBackgroundColor: 'rgba(75, 192, 192, 1)', // Set the point color
+                        data: values,
+                    }]
+                },
+                options: {
+                    animations: {
+                        tension: {
+                            duration: 1000,
+                            easing: 'linear',
+                            from: 1,
+                            to: 0,
+                            loop: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMin: 0,
+                            ticks: {
+                                stepSize: 10000 
+                            }
+                        },
+                        x: {
+                            type: 'category', 
+                            labels: labels,
+                        }
+                    }
+                }
+            });
+            updateTotalRevenueInYear(totalRevenueInYear);
+            updateTotalRevenueInMonthLineChart(totalRevenueInMonth);
+        }
+    }
+    function prepareLineChartData(data, monthlyData) {
+        var selectedYear = document.getElementById('yearSelect').value;
+        var labels = Array.from({ length: 12 }, (_, i) => moment(`${i + 1}/01/${selectedYear}`, 'MM/DD/YYYY').format('MMMM'));
+        var values = Array(12).fill(0);
+        console.log('Data in prepareLineChartData:', data);
+        console.log('Monthly Data in prepareLineChartData:', monthlyData);
+
+        if (Array.isArray(monthlyData)) {
+            monthlyData.forEach((monthData, index) => {
+                console.log(`MonthData[${index}]:`, monthData);
+                var monthIndex = parseInt(monthData.month, 10) - 1;
+                console.log(`Calculated monthIndex[${index}]:`, monthIndex);
+                console.log(`Total for Month[${index}]:`, monthData.total);
+                if (!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < 12) {
+                    values[monthIndex] = monthData.total || 0;
+                    console.log(`Updated values[${monthIndex}] with Total[${index}]:`, values[monthIndex]);
+                } else {
+                    console.error('Invalid monthIndex:', monthIndex);
+                }
+            });
+        }
+
+        var totalRevenueInMonth = 0;
+        var totalRevenueInYear = 0;
+
+        if (data && data.data && data.data.length > 0) {
+            totalRevenueInMonth = data.data.reduce((total, item) => total + item.total, 0);
+        }
+
+        // Kiểm tra xem totalRevenueInYear có tồn tại không
+        if (data && data.hasOwnProperty('totalRevenueInYear')) {
+            totalRevenueInYear = data.totalRevenueInYear;
+        }
+        console.log('Monthly Data in prepareLineChartData:', monthlyData);
+        console.log('Values in prepareLineChartData:', values);
+
+        return { labels, values, totalRevenueInMonth, totalRevenueInYear, monthlyData };
+    }
+    function prepareChartData(data, monthlyData) {
+        var selectedYear = document.getElementById('yearSelect').value;
+        var selectedMonth = document.getElementById('monthSelect').value;
+        var transformedMonthlyData = monthlyData.map(item => ({ Total: item.Total || 0 }));
+
+        // Lấy ngày đầu tiên của tháng để xác định số ngày trong tháng
+        var firstDayOfMonth = moment(`${selectedMonth}/01/${selectedYear}`, 'MM/DD/YYYY');
+        var daysInMonth = firstDayOfMonth.daysInMonth();
+
+        // Khởi tạo mảng cho labels và values, sử dụng fill() để tạo mảng có giá trị mặc định
+        var labels = Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => `Ngày ${day}`);
+        var values = Array(daysInMonth).fill(0);
+
+        // Tính tổng doanh thu trong tháng và năm
+        var totalRevenueInMonth = 0;
+        var totalRevenueInYear = 0;
+
+        if (data && data.data && data.data.length > 0) {
+            totalRevenueInMonth = data.data.reduce((total, item) => total + item.total, 0);
+        }
+
+        // Kiểm tra xem totalRevenueInYear có tồn tại không
+        if (data && data.hasOwnProperty('totalRevenueInYear')) {
+            totalRevenueInYear = data.totalRevenueInYear;
+        }
+
+        // Lặp qua từng ngày và cập nhật giá trị nếu có dữ liệu
+        data.data.forEach(dayData => {
+            var dayIndex = dayData.date - 1; // Ngày bắt đầu từ 1, mảng bắt đầu từ 0
+            values[dayIndex] = dayData.total;
+        });
+        return { labels, values, totalRevenueInMonth, totalRevenueInYear, monthlyData: transformedMonthlyData };
+    }
+
+
+    //Cập nhật tổng doanh thu của tháng
+    function updateTotalRevenueInMonth(totalRevenue) {
+        console.log("Tổng doanh thu tháng (trước định dạng): ", totalRevenue);
+
+        // Kiểm tra xem totalRevenue có phải là một số không
+        if (typeof totalRevenue === 'number' && !isNaN(totalRevenue)) {
+            // Áp dụng định dạng số tiền và cập nhật lên giao diện
+            document.getElementById('totalRevenueInMonth').textContent = `${totalRevenue.toLocaleString()} VNĐ`;
+        } else {
+            console.error('Giá trị không hợp lệ cho tổng doanh thu tháng.');
+        }
+    }
+    //Cập nhật tổng doanh thu của tháng(Line-Chart)
+    function updateTotalRevenueInMonthLineChart(totalRevenue) {
+        totalRevenue = 0;
+        document.getElementById('totalRevenueInMonth').textContent = `${totalRevenue.toLocaleString()} VNĐ`;
+    }
+    //Cập nhật tổng doanh thu của năm
+    function updateTotalRevenueInYear(totalRevenue) {
+        console.log("Tổng doanh thu năm: ", totalRevenue);
+
+        // Kiểm tra xem totalRevenue có phải là một số không
+        if (typeof totalRevenue === 'number' && !isNaN(totalRevenue)) {
+            // Áp dụng định dạng số tiền và cập nhật lên giao diện
+            document.getElementById('totalRevenueInYear').textContent = `${totalRevenue.toLocaleString()} VNĐ`;
+        } else {
+            console.error('Giá trị không hợp lệ cho tổng doanh thu năm.');
+        }
+    }
+    // Hàm để tạo danh sách tùy chọn cho ô chọn năm, tháng và ngày
+    function populateDateFields() {
+        var currentDate = new Date();
+        var currentYear = currentDate.getFullYear();
+        var currentMonth = currentDate.getMonth() + 1; // Tháng bắt đầu từ 0
+        var currentDay = currentDate.getDate();
+
+        // Ô chọn năm
+        var yearSelect = document.getElementById('yearSelect');
+        for (var year = currentYear; year >= 2000; year--) {
+            var option = document.createElement('option');
+            option.value = year;
+            option.text = year;
+            yearSelect.add(option);
+        }
+        yearSelect.value = currentYear; // Đặt giá trị mặc định
+
+        // Ô chọn tháng
+        var monthSelect = document.getElementById('monthSelect');
+        for (var month = 1; month <= 12; month++) {
+            var option = document.createElement('option');
+            option.value = month;
+            option.text = month;
+            monthSelect.add(option);
+        }
+        monthSelect.value = currentMonth; // Đặt giá trị mặc định
+
+        // Ô chọn ngày
+        // var daySelect = document.getElementById('daySelect');
+        // for (var day = 1; day <= 31; day++) {
+        //     var option = document.createElement('option');
+        //     option.value = day;
+        //     option.text = day;
+        //     daySelect.add(option);
+        // }
+        // daySelect.value = currentDay; // Đặt giá trị mặc định
+    }
+
+
+    $(document).ready(function () {
+        // Disable ban đầu khi trang tải
+        $('#monthSelect').prop('disabled', false);
+
+        // Xử lý sự kiện khi lựa chọn thay đổi
+        $('#chartTypeSelect').change(function () {
+            if ($(this).val() === 'bar') {
+                $('#monthSelect').prop('disabled', false);
+            } else {
+                $('#monthSelect').prop('disabled', true);
+            }
+        });
+    });
+
+    // Gọi hàm để tạo danh sách tùy chọn khi trang được tải
+    document.addEventListener("DOMContentLoaded", function () {
+        populateDateFields();
+        setupExportButton();
+    });
+
+
+</script>

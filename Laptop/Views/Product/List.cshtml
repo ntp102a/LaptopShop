@@ -1,0 +1,263 @@
+﻿@using PagedList.Core.Mvc
+@model PagedList.Core.IPagedList<LaptopShop.Models.Product>
+
+@{
+    Category category = ViewBag.CurrentCat;
+    ViewData["Title"] = "Brand";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int PageCurrent = ViewBag.CurrentPage;
+    int NextPage = PageCurrent + 1;
+}
+
+
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="breadcrumb-tree">
+                    <li><a href="/">Trang chủ</a></li>
+                    <li><a href="/shop.html">Tất cả sản phẩm</a></li>
+                    <li class="active">@category.CategoryName</li>
+                </ul>
+            </div>
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /BREADCRUMB -->
+<!-- SECTION -->
+<div class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <!-- ASIDE -->
+            <div id="aside" class="col-md-3">
+                <!-- aside Widget -->
+                <div class="aside">
+                    <h3 class="aside-title">Hãng</h3>
+                    <div class="checkbox-filter">
+                        @foreach (var item in ViewBag.Categories)
+                        {
+                            <div class="input-checkbox">
+                                <input type="checkbox" id="brand-@item.CategoryId" class="category-checkbox" data-category-id="@item.CategoryId">
+                                <label for="brand-@item.CategoryId">
+                                    <span></span>
+                                    @item.CategoryName
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <!-- /aside Widget -->
+            </div>
+            <!-- /ASIDE -->
+            <!-- STORE -->
+            <div id="store" class="col-md-9">
+                <!-- store top filter -->
+                <div class="store-filter clearfix">
+                    <div class="store-sort">
+                        <label>
+                            Sort:
+                            <select id="sortSelect" class="sort-select">
+                                <option value="0">Tất cả</option>
+                                <option value="1">Tăng dần theo giá</option>
+                                <option value="2">Giảm dần theo giá</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Show:
+                            <select id="pageSizeSelect" class="show-select">
+                                <option value="12" selected>12</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <!-- /store top filter -->
+                <!-- store products -->
+                <div class="row">
+                    @if (Model != null)
+                    {
+                        @foreach (var item in Model)
+                        {
+                            string url = $"/Product/Details/{item.ProductId}";
+                            decimal oldPrice = item.Price ?? 0; // Giá cũ (nếu null, mặc định là 0)
+                            decimal discount = item.Discount ?? 0; // Tỷ lệ giảm giá (nếu null, mặc định là 0)
+                            decimal newPrice = oldPrice - (oldPrice * discount / 100); // Giá mới
+
+                            string formattedOldPrice = oldPrice.ToString("#,##0") + " VND";
+                            string formattedNewPrice = newPrice.ToString("#,##0") + " VND";
+
+                            <!-- product 1 -->
+                            <div class="col-md-4 col-xs-6">
+                                <div class="product">
+                                    <div class="product-img">
+                                        <a href="@url">
+                                            <img width="250" height="250" src="/images/products/@item.Image.ImageThumb" alt="">
+                                        </a>
+                                        <div class="product-label">
+                                            @if (discount > 0)
+                                            {
+                                                <span class="sale">-@discount%</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="product-body">
+                                        <h3 class="product-name"><a href="@url">@item.ProductName</a></h3>
+                                        <h4 class="product-price">
+                                            @formattedNewPrice @if (discount > 0)
+                                            {
+                                                <del class="product-old-price">@formattedOldPrice</del>
+                                            }
+                                        </h4>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <button class="add-to-cart-btn">
+                                            <i class="fa fa-shopping-cart"></i>
+                                            Thêm vào giỏ hàng
+                                            <input hidden asp-for="@item.ProductId" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /product -->
+                            <div class="clearfix visible-sm visible-xs"></div>
+                        }
+                    }
+                </div>
+
+                <!-- store bottom filter -->
+                <div class="store-filter clearfix">
+                    <ul class="store-pagination">
+                        @for (int i = 1; i <= Model.PageCount; i++)
+                        {
+                            <li class="@(i == Model.PageNumber ? "active" : "")">
+                                @if (i != Model.PageNumber)
+                                {
+                                    <a href="@Url.Action("List", new { id = ViewBag.CurrentCat.CategoryId, page = i })">@i</a>
+                                }
+                                else
+                                {
+                                    <span>@i</span>
+                                }
+                            </li>
+                        }
+
+                    </ul>
+                </div>
+                <!-- /store bottom filter -->
+
+
+
+            </div>
+            <!-- /STORE -->
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /SECTION -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<style>
+    .sort-select {
+        padding: 0px 15px;
+        background: #FFF;
+        border: 1px solid #E4E7ED;
+        height: 40px;
+    }
+
+    .show-select {
+        padding: 0px 15px;
+        background: #FFF;
+        border: 1px solid #E4E7ED;
+        height: 40px;
+    }
+</style>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                $(".add-to-cart-btn").click(function () {
+                    var productid = $(this).find("input").val();
+                    $.ajax({
+                        url: '/api/cart/add',
+                        type: "POST",
+                        dataType: "JSON",
+                        data: {
+                            productID: productid
+                        },
+                        success: function (response) {
+                            if (response.result == 'Redirect') {
+                                window.location = response.url;
+                            }
+                            else {
+                                loadHeaderCart();
+                                location.reload();
+                            }
+                            console.log(response);
+                        },
+                        error: function (error) {
+                            alert("Vui lòng đăng nhập trước" + error.responseText);
+                        }
+                    });
+                });
+            });
+
+            function loadHeaderCart() {
+                $("#headerCart").load("/AjaxContent/HeaderCart");
+            }
+
+            $("#pageSizeSelect").change(function () {
+                var selectedPageSize = $(this).val();
+                var selectedSort = $("#sortSelect").val();
+                var url = '/Product/List/@category.CategoryId?page=1&pagesize=' + selectedPageSize + '&sort=' + selectedSort;
+                localStorage.setItem('selectedPageSize', selectedPageSize);
+                window.location.href = url;
+            });
+
+            var initialPageSize = localStorage.getItem('selectedPageSize') || $("#pageSizeSelect").val();
+            $("#pageSizeSelect").val(initialPageSize);
+
+            $("#sortSelect").change(function () {
+                var selectedSort = $(this).val();
+                var selectedPageSize = $("#pageSizeSelect").val();
+                var url = '/Product/List/@category.CategoryId?page=1&pagesize=' + selectedPageSize + '&sort=' + selectedSort;
+                localStorage.setItem('selectedSort', selectedSort);
+                window.location.href = url;
+            });
+
+            var initialSort = localStorage.getItem('selectedSort') || $("#sortSelect").val();
+            $("#sortSelect").val(initialSort);
+
+            var selectedCategoryIds = [];
+            $('.category-checkbox').change(function () {
+                console.log('Updating products visibility!');
+                updateProductsVisibility();
+            });
+            function updateProductsVisibility() {
+                selectedCategoryIds = $('.category-checkbox:checked').map(function () {
+                    return $(this).data('category-id');
+                }).get();
+                console.log('Selected category IDs:', selectedCategoryIds);
+                if (selectedCategoryIds.length > 0) {
+                    $('.product-item').hide();
+                    $.each(selectedCategoryIds, function (index, categoryId) {
+                        $('.product-item.category-' + categoryId).show();
+                    });
+                } else {
+                    $('.product-item').show();
+                }
+            }
+            if (selectedCategoryIds.length > 0) {
+                updateProductsVisibility();
+            }
+        });
+    </script>
+}

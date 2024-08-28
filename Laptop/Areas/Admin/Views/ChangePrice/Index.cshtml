@@ -1,0 +1,73 @@
+﻿@using PagedList.Core.Mvc
+@model PagedList.Core.IPagedList<LaptopShop.Models.Category>
+@{
+    ViewData["Title"] = "Danh mục sản phẩm: " + ViewBag.CurrentPage;
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a asp-area="Admin" asp-controller="ChangePrice" asp-action="Index" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Home</a>
+            <span class="breadcrumb-item active">Danh mục sản phẩm : page @ViewBag.CurrentPage</span>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null)
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <th scope="row">@item.CategoryId</th>
+                                <td>@item.CategoryName</td>
+                                <td>
+                                    <a data-target="#modal-header" data-toggle="modal" class="btn btn-primary btn-tone m-r-5"
+                               onclick="openProductPopup(@item.CategoryId)">
+                                        Thay đổi giá
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <div aria-label="Page navigation example">
+                <ul class="pagination">
+                    <pager class="page-container" list="@Model" asp-area="Admin" asp-controller="ChangePrice" asp-action="Index" />
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modal-header" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function openProductPopup(categoryId) {
+            var url = '/Admin/ChangePrice/ChangePriceProducts?categoryId=' + categoryId;
+
+            $.get(url, function(data) {
+                $('#modal-header .modal-content').html(data);
+                $('#modal-header').modal('show');
+            });
+        }
+    </script>
+}

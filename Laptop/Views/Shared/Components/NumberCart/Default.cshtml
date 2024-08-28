@@ -1,0 +1,18 @@
+﻿@model List<LaptopShop.Models.Cart>
+@if (Model != null && Model.Count() > 0)
+{
+    <a href="#miniCart" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+        <i class="fa fa-shopping-cart"></i>
+        <span>Giỏ hàng</span>
+        <div class="qty">@Model.Count()</div>
+    </a>
+}
+else
+{
+    <a href="#miniCart" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+        <i class="fa fa-shopping-cart"></i>
+        <span>Giỏ hàng</span>
+        <div class="qty">0</div>
+    </a>
+}
+

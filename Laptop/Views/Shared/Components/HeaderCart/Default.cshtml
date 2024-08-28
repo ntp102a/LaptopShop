@@ -1,0 +1,43 @@
+﻿@model List<LaptopShop.Models.Cart>
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="cart-dropdown">
+        <div class="cart-list">
+            @foreach (var item in Model)
+            {
+                string url = $"/Product/Details/{item.Product.ProductId}";
+                <div class="product-widget">
+                    @*<div class="product-img">
+            <img href="@url" src="~/images/products/@item.product.Image.ImageThumb" alt="">
+            </div>*@
+                    <div class="product-body">
+                        <h3 class="product-name"><a href="@url">@item.Product.ProductName</a></h3>
+                        <h4 class="product-price"><span class="qty">x @item.Quantity</span>@item.Product.Price.Value.ToString("#, ##0") VNĐ</h4>
+                    </div>
+                    <button class="delete"><i class="fa fa-close"></i></button>
+                </div>
+
+            }
+        </div>
+        <div class="cart-summary">
+            <h5>Tổng tiền: @Model.Sum(x => x.TotalMoney).ToString("#, ##0") VND</h5>
+        </div>
+        <div class="cart-btns">
+            <a href="cart.html">Giỏ hàng</a>
+            <a href="checkout.html">Thanh toán<i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="cart-dropdown">
+        <div class="cart-list">
+            Hãy thêm sản phẩm vào giỏ hàng
+        </div>
+        <div class="cart-btns">
+            <a href="cart.html">Giỏ hàng</a>
+            <a href="checkout.html">Thanh toán<i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+}
+

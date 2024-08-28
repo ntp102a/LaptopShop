@@ -1,0 +1,98 @@
+﻿@model LaptopShop.Models.User
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Order> DanhSachDonHang = ViewBag.Donhang;
+    LaptopShop.ModelViews.ChangeInfoViewModel changeInfo = new LaptopShop.ModelViews.ChangeInfoViewModel();
+    LaptopShop.ModelViews.ChangePasswordViewModel changePassword = new LaptopShop.ModelViews.ChangePasswordViewModel();
+}
+
+<div class="nav-item">
+    <p></p>
+    <main class="main-content">
+        <div class="account-page-area section-space-y-axis-10">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <ul class="nav myaccount-tab-trigger" id="account-page-tab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="account-dashboard-tab" data-bs-toggle="tab" href="#account-dashboard" role="tab" aria-controls="account-dashboard" aria-selected="true">Thông tin tài khoản</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="account-orders-tab" data-bs-toggle="tab" href="#account-orders" role="tab" aria-controls="account-orders" aria-selected="false">Danh sách đơn hàng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="account-details-tab" data-bs-toggle="tab" href="#account-details" role="tab" aria-controls="account-details" aria-selected="false">Thay đổi mật khẩu</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="info-details-tab" data-bs-toggle="tab" href="#info-details" role="tab" aria-controls="info-details" aria-selected="false">Thay đổi thông tin</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="account-logout-tab" href="/dang-xuat.html" role="tab" aria-selected="false">Đăng xuất</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="tab-content myaccount-tab-content" id="account-page-tab-content">
+                            <div class="tab-pane fade show active " id="account-dashboard" role="tabpanel" aria-labelledby="account-dashboard-tab">
+                                <div class="myaccount-dashboard">
+                                    <p>
+                                        Xin chào, <b>@Model.FullName</b>
+                                    </p>
+                                    <p>Email: @Model.Email</p>
+                                    <p>Số điện thoại: @Model.Phone</p>
+                                    <p>Địa chỉ: @Model.Address</p>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="account-orders" role="tabpanel" aria-labelledby="account-orders-tab">
+                                <div class="myaccount-orders">
+                                    <h4 class="small-title">DANH SÁCH ĐƠN HÀNG</h4>
+                                    @await Html.PartialAsync("_DonhangPartialView", DanhSachDonHang)
+                                    
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="info-details" role="tabpanel" aria-labelledby="info-details-tab">
+                                @await Html.PartialAsync("_ChangeInfoPartialView", changeInfo)
+                            </div>
+                            <div class="tab-pane fade" id="account-details" role="tabpanel" aria-labelledby="account-details-tab">
+                                @await Html.PartialAsync("_ChangePasswordPartialView", changePassword)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>    
+</div>
+
+@*@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(".xemdonhang").click(function () {
+                var productid = $(this).attr("data-madonhang");
+                $.ajax({
+                    url: '/DonHang/Details',
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        id: madonhang
+                    },
+                    async: true,
+                    success: function (results) {
+                        if (result.success) {
+                            $("#records_table").html("");
+                            $("#records_table").html(results);
+                        }
+                    },
+                    error: function (rhs) {
+                        alert("Lỗi");
+                    }
+                });
+            });
+        });
+    </script>
+}*@
+
+
+

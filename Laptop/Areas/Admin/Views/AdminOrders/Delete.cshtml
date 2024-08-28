@@ -1,0 +1,68 @@
+﻿@model LaptopShop.Models.Order
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Home</a>
+            <a class="breadcrumb-item" asp-area="Admin" asp-controller="AdminOrders" asp-action="Index">Danh sách đơn hàng</a>
+            <span class="breadcrumb-item active">Xoá đơn hàng : @Model.OrderId</span>
+        </nav>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">MÃ ĐƠN HÀNG : @Model.OrderId</h4>
+        <div class="table-responsive">
+            <table class="product-info-table m-t-20">
+                <tbody>
+                    <tr>
+                        <td>Người nhận:</td>
+                        <td>@Model.RecipientName</td>
+                    </tr>
+                    <tr>
+                        <td>Địa chỉ:</td>
+                        <td>@Model.Address</td>
+                    </tr>
+                    <tr>
+                        <td>Số điện thoại:</td>
+                        <td>@Model.Phone</td>
+                    </tr>
+                    <tr>
+                        <td>Ngày mua hàng:</td>
+                        <td>@Model.OrderDate</td>
+                    </tr>
+                    <tr>
+                        <td>Ghi chú :</td>
+                        <td>@Model.Note</td>
+                    </tr>
+                    <tr>
+                        <td>Người đặt:</td>
+                        <td>@Model.User.FullName</td>
+                    </tr>
+                    <tr>
+                        <td>Trạng thái:</td>
+                        <td>@Model.Status.Status</td>
+                    </tr>
+                    <tr>
+                        <td>Tổng tiền :</td>
+                        <td>@Model.Total</td>
+                    </tr>
+                    <tr>
+                        <td>Xác nhận xoá:</td>
+                        <td>
+                            <form asp-controller="AdminOrders" asp-action="Delete" asp-route-id="@Model.OrderId">
+                                <input type="hidden" asp-for="OrderId" />
+                                <input type="submit" value="Delete" class="btn btn-danger" />
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

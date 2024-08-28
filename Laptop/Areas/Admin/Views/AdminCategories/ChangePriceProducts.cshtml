@@ -1,0 +1,49 @@
+﻿@model List<LaptopShop.Models.Product>
+
+@{
+    ViewData["Title"] = "Change Price for Products";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Change Price for Products</h1>
+
+<form asp-action="ChangePriceProducts" method="post">
+    <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Price (VNĐ)</th>
+                <th>Discount (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input type="hidden" name="products[@i].ProductId" value="@Model[i].ProductId" />
+                        @Model[i].ProductId
+                    </td>
+                    <td>@Model[i].ProductName</td>
+                    <td>
+                        <div class="form-group">
+                            <input type="text" name="products[@i].Price" value="@Model[i].Price" class="form-control" />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="text" name="products[@i].Discount" value="@Model[i].Discount" class="form-control" />
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="form-group">
+        <input type="submit" value="Save Changes" class="btn btn-primary" />
+    </div>
+</form>

@@ -1,0 +1,24 @@
+﻿@model List<Product>
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.ProductId</td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <img class="img-fluid rounded" src="assets/images/others/thumb-9.jpg" style="max-width: 60px" alt="">
+                    <h6 class="m-b-0 m-l-10">@item.ProductName</h6>
+                </div>
+            </td>
+            <td>@item.Category.CategoryName</td>
+            <td>@item.Price.Value.ToString("#, ##0") VND</td>
+            <td>
+                <a class="btn btn-primary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminProducts" asp-action="Details" asp-route-id="@item.ProductId">View</a>
+                <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminProducts" asp-action="Edit" asp-route-id="@item.ProductId">Edit</a>
+                <a class="btn btn-success btn-tone m-r-5" asp-area="Admin" asp-controller="AdminProducts" asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
+            </td>
+        </tr>
+    }
+}

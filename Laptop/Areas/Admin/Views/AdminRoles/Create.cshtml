@@ -1,0 +1,35 @@
+﻿@model LaptopShop.Models.Role
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <h2 class="header-title">Create Roles</h2>
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Home</a>
+            <a class="breadcrumb-item" asp-area="Admin" asp-controller="AdminRoles" asp-action="Index">List of Roles</a>
+            <span class="breadcrumb-item active">Create Roles</span>
+        </nav>
+    </div>
+</div>
+
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <div class="form-group col-md-6">
+            <label class="col-sm-2 col-form-label">RoleName</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" asp-for="RoleName" placeholder="Role Name">
+            </div>
+        </div>
+        <div class="form-group col-md-6">
+            <div class="col-sm-6">
+                <button type="submit" value="Create" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+
+    </div>
+</form>
