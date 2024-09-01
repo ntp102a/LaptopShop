@@ -10,7 +10,7 @@ namespace LaptopShop.ModelViews
 {
     public class MuaHangVM
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         [RegularExpression(@"^[^\d!@#$%^&*()_+]+(?: [^\d!@#$%^&*()_+]+)*$", ErrorMessage = "Tên không hợp lệ")]
         public string? FullName { get; set; }
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Email không hợp lệ")]

@@ -65,7 +65,7 @@
                         <!-- tab -->
                         <div id="tab1" class="tab-pane active">
                             <div class="products-slick" data-nav="#slick-nav-1">
-                                @await Html.PartialAsync("_ListProductPartialView", allProducts);
+                                @await Html.PartialAsync("_ListProductPartialView", allProducts)
                             </div>
                             <div id="slick-nav-1" class="products-slick-nav"></div>
                         </div>
@@ -148,7 +148,7 @@
                         <!-- tab -->
                         <div id="top-selling" class="tab-pane active">
                             <div class="products-slick" data-nav="#slick-nav-2">
-                                @await Html.PartialAsync("_ListProductPartialView", topProducts);
+                                @await Html.PartialAsync("_ListProductPartialView", topProducts)
                             </div>
                             <div id="slick-nav-2" class="products-slick-nav"></div>
                         </div>

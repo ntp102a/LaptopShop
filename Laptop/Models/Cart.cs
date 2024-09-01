@@ -7,7 +7,7 @@ namespace LaptopShop.Models
     {
         public int CartId { get; set; }
         public int ProductId { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int? Quantity { get; set; }
         public double TotalMoney { get { return (double)(Quantity * Product.Price.Value); } }
 

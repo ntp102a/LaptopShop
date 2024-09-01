@@ -26,10 +26,10 @@ namespace LaptopShop.Controllers
             {
                 var accountID = User.Identity.GetAccountID();
 
-                if (int.TryParse(accountID, out var userId))
+                if (!string.IsNullOrEmpty(accountID))
                 {
                     var cartItem = _context.Carts
-                        .FirstOrDefault(c => c.UserId == userId && c.ProductId == productID);
+                        .FirstOrDefault(c => c.UserId == accountID && c.ProductId == productID);
 
                     if (cartItem != null)
                     {
@@ -39,7 +39,7 @@ namespace LaptopShop.Controllers
                     {
                         var newCartItem = new Cart
                         {
-                            UserId = userId,
+                            UserId = accountID,
                             ProductId = productID,
                             Quantity = amount ?? 1
                         };
@@ -71,10 +71,10 @@ namespace LaptopShop.Controllers
             {
                 var accountID = User.Identity.GetAccountID();
 
-                if (int.TryParse(accountID, out var userId))
+                if (!string.IsNullOrEmpty(accountID))
                 {
                     var cartItem = _context.Carts
-                        .FirstOrDefault(c => c.UserId == userId && c.ProductId == productID);
+                        .FirstOrDefault(c => c.UserId == accountID && c.ProductId == productID);
 
                     if (cartItem != null && amount.HasValue)
                     {
@@ -101,10 +101,10 @@ namespace LaptopShop.Controllers
             {
                 var accountID = User.Identity.GetAccountID();
 
-                if (int.TryParse(accountID, out var userId))
+                if (!string.IsNullOrEmpty(accountID))
                 {
                     var cartItem = _context.Carts
-                        .FirstOrDefault(c => c.UserId == userId && c.ProductId == productID);
+                        .FirstOrDefault(c => c.UserId == accountID && c.ProductId == productID);
 
                     if (cartItem != null)
                     {
@@ -126,7 +126,7 @@ namespace LaptopShop.Controllers
         [Route("cart.html", Name = "Cart")]
         public IActionResult Index()
         {
-            var userId = int.Parse(User.Identity.GetAccountID());
+            var userId = User.Identity.GetAccountID();
             var gioHang = _context.Carts
                 .Include(c => c.Product)
                 .Include(c => c.User)

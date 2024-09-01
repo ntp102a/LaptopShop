@@ -21,12 +21,12 @@ namespace LaptopShop.Controllers.Components
         {
             var accountID = User.Identity.GetAccountID();
 
-            if (int.TryParse(accountID, out var userId))
+            if (!string.IsNullOrEmpty(accountID))
             {
                 var cartItems = _context.Carts
                 .Include(c => c.Product)
                 .Include(c=> c.Product.Image)
-                .Where(c => c.UserId == userId)
+                .Where(c => c.UserId == accountID)
                 .Select(c => new Cart
                 {
                     Product = c.Product,

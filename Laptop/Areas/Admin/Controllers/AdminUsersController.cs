@@ -44,7 +44,7 @@ namespace LaptopShop.Areas.Admin.Controllers
         }
 
         // GET: Admin/AdminUsers/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.Users == null)
             {
@@ -76,6 +76,7 @@ namespace LaptopShop.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(User user)
         {
+            user.UserId = Guid.NewGuid().ToString();
             string salt = Utilities.GetRandomKey();
             user.Salt = salt;
 
@@ -89,29 +90,32 @@ namespace LaptopShop.Areas.Admin.Controllers
         }
 
         // GET: Admin/AdminUsers/Edit/5
-        public async Task<IActionResult> Edit(int? id, UserViewModel model)
+        [HttpGet]
+        public async Task<IActionResult> Edit(string id)
         {
-            if (id == null || _context.Users == null)
+            if (string.IsNullOrEmpty(id) || _context.Users == null)
             {
                 return NotFound();
             }
 
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserId == id);
             if (user == null)
             {
                 return NotFound();
             }
-            else
+
+            var model = new UserViewModel
             {
-                model.UserId = user.UserId;
-                model.FullName = user.FullName;
-                model.Phone = user.Phone;
-                model.Email = user.Email;
-                model.Address = user.Address;
-                model.Password = user.Password;
-                model.Salt = user.Salt;
-                model.RoleId = user.RoleId;
-            }
+                UserId = user.UserId,
+                FullName = user.FullName,
+                Phone = user.Phone,
+                Email = user.Email,
+                Address = user.Address,
+                Password = user.Password,
+                Salt = user.Salt,
+                RoleId = user.RoleId
+            };
+
             ViewData["RoleId"] = new SelectList(_context.Roles, "RoleId", "RoleName", model.RoleId);
             return View(model);
         }
@@ -121,7 +125,7 @@ namespace LaptopShop.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, UserViewModel model)
+        public async Task<IActionResult> Edit(string id, UserViewModel model)
         {
             if (id != model.UserId)
             {
@@ -150,7 +154,6 @@ namespace LaptopShop.Areas.Admin.Controllers
                         await _context.SaveChangesAsync();
                         _notyfService.Success("Sửa thành công");
                     }
-                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -169,7 +172,7 @@ namespace LaptopShop.Areas.Admin.Controllers
         }
 
         // GET: Admin/AdminUsers/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Users == null)
             {
@@ -190,7 +193,7 @@ namespace LaptopShop.Areas.Admin.Controllers
         // POST: Admin/AdminUsers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Users == null)
             {
@@ -234,7 +237,7 @@ namespace LaptopShop.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+        private bool UserExists(string id)
         {
             return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();
         }

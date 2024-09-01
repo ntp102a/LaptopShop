@@ -33,12 +33,12 @@ namespace LaptopShop.Controllers
             {
                 var accountID = User.Identity.GetAccountID();
 
-                if (!string.IsNullOrEmpty(accountID) && int.TryParse(accountID, out var userId))
+                if (!string.IsNullOrEmpty(accountID))
                 {
                     var gioHang = _context.Carts
                         .Include(c => c.Product)
                         .Include(c => c.User)
-                        .Where(c => c.UserId == userId)
+                        .Where(c => c.UserId == accountID)
                         .ToList();
 
                     var cartItems = gioHang.Select(c => new Cart
@@ -70,12 +70,12 @@ namespace LaptopShop.Controllers
             {
                 var accountID = User.Identity.GetAccountID();
 
-                if (int.TryParse(accountID, out var userId))
+                if (!string.IsNullOrEmpty(accountID))
                 {
                     var model = new MuaHangVM();
                     var khachhang = _context.Users
                         .AsNoTracking()
-                        .SingleOrDefault(x => x.UserId == userId);
+                        .SingleOrDefault(x => x.UserId == accountID);
 
                     if (khachhang != null)
                     {
@@ -89,7 +89,7 @@ namespace LaptopShop.Controllers
                     // Lấy giỏ hàng từ CSDL
                     var cart = _context.Carts
                         .Include(c => c.Product)
-                        .Where(c => c.UserId == userId)
+                        .Where(c => c.UserId == accountID)
                         .Select(c => new Cart
                         {
                             Product = c.Product,
@@ -119,15 +119,15 @@ namespace LaptopShop.Controllers
             {
                 var accountID = User.Identity.GetAccountID();
 
-                if (int.TryParse(accountID, out var userId))
+                if (!string.IsNullOrEmpty(accountID))
                 {
                     var cart = _context.Carts
                         .Include(c => c.Product)
-                        .Where(c => c.UserId == userId)
+                        .Where(c => c.UserId == accountID)
                         .ToList();
 
                     var khachhang = _context.Users
-                        .SingleOrDefault(x => x.UserId == userId);
+                        .SingleOrDefault(x => x.UserId == accountID);
 
                     if (khachhang.Address == null)
                     {
@@ -138,7 +138,7 @@ namespace LaptopShop.Controllers
 
                     var donhang = new Models.Order
                     {
-                        UserId = userId,
+                        UserId = accountID,
                         RecipientName = muahang.FullName,
                         Address = muahang.Address,
                         Phone = muahang.Phone,
@@ -196,7 +196,7 @@ namespace LaptopShop.Controllers
                 if (!string.IsNullOrEmpty(accountID) && int.TryParse(accountID, out var userId))
                 {
                     var donhang = _context.Orders
-                        .Where(x => x.UserId == userId)
+                        .Where(x => x.UserId == accountID)
                         .OrderByDescending(x => x.OrderDate)
                         .FirstOrDefault();
 
@@ -211,7 +211,7 @@ namespace LaptopShop.Controllers
                         };
 
                         var cartItems = _context.Carts
-                            .Where(c => c.UserId == userId)
+                            .Where(c => c.UserId == accountID)
                             .ToList();
 
                         _context.Carts.RemoveRange(cartItems);
@@ -329,22 +329,22 @@ namespace LaptopShop.Controllers
                 #region Update vào csdl
                 var accountID = User.Identity.GetAccountID();
 
-                if (!string.IsNullOrEmpty(accountID) && int.TryParse(accountID, out var userId))
+                if (!string.IsNullOrEmpty(accountID))
                 {
                     var khachhang = _context.Users
                         .AsNoTracking()
-                        .SingleOrDefault(x => x.UserId == userId);
+                        .SingleOrDefault(x => x.UserId == accountID);
 
                     var cartItems = _context.Carts
                         .Include(c => c.Product)
-                        .Where(c => c.UserId == userId)
+                        .Where(c => c.UserId == accountID)
                         .ToList();
 
                     if (cartItems.Any())
                     {
                         var donhang = new Models.Order
                         {
-                            UserId = userId,
+                            UserId = accountID,
                             Address = khachhang?.Address,
                             Phone = khachhang?.Phone,
                             RecipientName = khachhang.FullName,

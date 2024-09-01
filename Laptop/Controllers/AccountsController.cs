@@ -56,7 +56,7 @@ namespace LaptopShop.Controllers
         {
             try
             {
-                var khachhang = _context.Users                    
+                var khachhang = _context.Users
                     .AsNoTracking()
                     .SingleOrDefault(x => x.Email.ToLower() == Email.ToLower());
                 if (khachhang != null)
@@ -80,7 +80,7 @@ namespace LaptopShop.Controllers
             {
                 var khachhang = _context.Users
                     .AsNoTracking()
-                    .SingleOrDefault(x => x.UserId == Convert.ToInt32(taikhoanID));
+                    .SingleOrDefault(x => x.UserId == taikhoanID);
                 if (khachhang != null)
                 {
                     var lsDonhang = _context.Orders
@@ -120,6 +120,7 @@ namespace LaptopShop.Controllers
                     string salt = Utilities.GetRandomKey();
                     User khachhang = new User
                     {
+                        UserId = Guid.NewGuid().ToString(),
                         FullName = taikhoan.Fullname,
                         Phone = taikhoan.Phone.Trim().ToLower(),
                         Email = taikhoan.Email.Trim().ToLower(),
@@ -228,7 +229,7 @@ namespace LaptopShop.Controllers
                     else
                         return RedirectToAction("Index", "Home");
                 }
-                
+
             }
             catch
             {
@@ -302,7 +303,7 @@ namespace LaptopShop.Controllers
             {
                 var accountID = User.Identity.GetAccountID();
 
-                if (int.TryParse(accountID, out var userId))
+                if (!string.IsNullOrEmpty(accountID))
                 {
                     var existingUser = _context.Users.SingleOrDefault(x => x.Phone.ToLower() == model.Phone.ToLower());
                     if (existingUser != null)
@@ -311,7 +312,7 @@ namespace LaptopShop.Controllers
                         _notyfService.Success("Số điện thoại đã tồn tại");
                         return RedirectToAction("Dashboard", "Accounts");
                     }
-                    var user = _context.Users.SingleOrDefault(x => x.UserId == userId);
+                    var user = _context.Users.SingleOrDefault(x => x.UserId == accountID);
                     if (model != null)
                     {
                         user.FullName = model.FullName;

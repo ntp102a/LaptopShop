@@ -9,7 +9,7 @@
         public DateTime? OrderDate { get; set; }
         public int? Total { get; set; }
         public string? Note { get; set; }
-        public int? UserId { get; set; }
+        public string UserId { get; set; }
         public int? StatusId { get; set; }
     }
 }

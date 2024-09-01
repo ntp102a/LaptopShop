@@ -31,12 +31,12 @@ namespace LaptopShop.Controllers
                 if (string.IsNullOrEmpty(taikhoanID)) return RedirectToAction("Login", "Accounts");
                 var khachhang = _context.Users
                     .AsNoTracking()
-                    .SingleOrDefault(x => x.UserId == Convert.ToInt32(taikhoanID));
+                    .SingleOrDefault(x => x.UserId == taikhoanID);
 
                 if (khachhang == null) return NotFound();
                 var donhang= await _context.Orders
                     .Include(x => x.Status.Status)
-                    .FirstOrDefaultAsync(x => x.OrderId== id && Convert.ToInt32(taikhoanID) == x.UserId);
+                    .FirstOrDefaultAsync(x => x.OrderId== id && taikhoanID == x.UserId);
                 if (donhang == null) return NotFound();
 
                 var chitietdonhang = _context.OrderDetails
