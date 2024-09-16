@@ -100,44 +100,43 @@
                             <div class ="order-total"><strong>@Carts.Sum(x => x.TotalMoney).ToString("#,##0") VNĐ</strong></div>
                         </div>
                     </div>
-                    @*<div class="payment-method">
-                        <h1>Chọn phương thức thanh toán</h1>
+                    
+                    <!-- Payment Method Selection -->
+                    <div class="payment-method">
+                        <h3>Chọn phương thức thanh toán</h3>
                         <div class="input-radio">
-                            <input type="radio" name="payment" id="payment-1">
+                            <input type="radio" id="payment-1" name="PaymentMethod" value="COD" checked>
                             <label for="payment-1">
                                 <span></span>
                                 Thanh toán khi nhận hàng
                             </label>
                         </div>
-                        <div class="input-radio">
-                            <input type="radio" name="payment" id="payment-2">
+                        @*<div class="input-radio">
+                            <input type="radio" id="payment-2" name="PaymentMethod" value="Paypal">
                             <label for="payment-2">
                                 <span></span>
-                                Chuyển khoản
+                                PayPal
                             </label>
-                            <div class="caption">
-                                <p>THÔNG TIN TÀI KHOẢN NGÂN HÀNG</p>
-                                <p>CHỦ TÀI KHOẢN: NGUYEN TAN PHUOC</p>
-                                <p>SỐ TÀI KHOẢN: 123456789 - Ngân hàng BIDV</p>
-                                <p>NỘI DUNG CHUYỂN KHOẢN: Tên + Địa chỉ + Ngày đặt hàng</p>
-
-
-                            </div>
-                        </div>
+                        </div>*@
                         <div class="input-radio">
-                        <input type="radio" name="payment" id="payment-3">
-                        <label for="payment-3">
-                        <span></span>
-                        Paypal System
-                        </label>
+                            <input type="radio" id="payment-2" name="PaymentMethod" value="VnPay">
+                            <label for="payment-2">
+                                <span></span>
+                                VnPay
+                            </label>
                         </div>
-                    </div>*@
+                    </div>
+                    <!-- /Payment Method Selection -->
+
                     <div class="order-button-payment">
                         <input value="XÁC NHẬN ĐẶT HÀNG" type="submit">
                     </div>
                     <a asp-action="PaypalCheckout">
                         <img src="~/images/paypal_checkout.gif" height="100" />
                     </a>
+                    @*<a asp-action="VnPayCheckout">
+                        <img src="~/images/Logo-VNPAY-QR.gif" height="100" />
+                    </a>*@
                 </div>
                 <!-- /Order Details -->
             </div>

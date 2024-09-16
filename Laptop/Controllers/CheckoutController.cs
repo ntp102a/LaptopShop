@@ -3,6 +3,7 @@ using BraintreeHttp;
 using LaptopShop.Extension;
 using LaptopShop.Models;
 using LaptopShop.ModelViews;
+using LaptopShop.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +19,15 @@ namespace LaptopShop.Controllers
         private readonly string _clientId;
         private readonly string _clientSecret;
         public double TyGiaUSD = 24535;
+        private readonly IVnPayService _vnPayservice;
         public INotyfService _notyfService { get; }
-        public CheckoutController(laptopWebContext context, INotyfService notyfService, IConfiguration config)
+        public CheckoutController(laptopWebContext context, INotyfService notyfService, IConfiguration config, IVnPayService vnPayservice)
         {
             _context = context;
             _notyfService = notyfService;
             _clientId = config["PayPalSettings:clientId"];
             _clientSecret = config["PayPalSettings:clientSecret"];
+            _vnPayservice = vnPayservice;
         }
 
         public List<Cart> GioHang
@@ -117,6 +120,28 @@ namespace LaptopShop.Controllers
         {
             try
             {
+                string paymentMethod = Request.Form["PaymentMethod"];
+                if(paymentMethod == "VnPay")
+                {
+                    var total = 0.0;
+                    foreach (var item in GioHang)
+                    {
+                        var totalProduct = item.Product.Price * item.Quantity;
+                        total += (double)totalProduct;
+                    }
+
+                    var vnPayModel = new VnPaymentRequestModel
+                    {
+                        Amount = total,
+                        CreatedDate = DateTime.Now,
+                        Description = $"{muahang.FullName} {muahang.Phone}",
+                        FullName = muahang.FullName,
+                        OrderId = new Random().Next(1000, 100000)
+                    };
+
+                    return Redirect(_vnPayservice.CreatePaymentUrl(HttpContext, vnPayModel));
+                }
+
                 var accountID = User.Identity.GetAccountID();
 
                 if (!string.IsNullOrEmpty(accountID))
@@ -193,7 +218,7 @@ namespace LaptopShop.Controllers
             {
                 var accountID = User.Identity.GetAccountID();
 
-                if (!string.IsNullOrEmpty(accountID) && int.TryParse(accountID, out var userId))
+                if (!string.IsNullOrEmpty(accountID))
                 {
                     var donhang = _context.Orders
                         .Where(x => x.UserId == accountID)
@@ -220,7 +245,7 @@ namespace LaptopShop.Controllers
                         return View(successVM);
                     }
                 }
-
+                _notyfService.Error("Đặt hàng không thành công");
                 return RedirectToAction("Login", "Accounts", new { returnUrl = "/dat-hang-thanh-cong.html" });
             }
             catch
@@ -388,6 +413,23 @@ namespace LaptopShop.Controllers
 
                 return Redirect("/dat-hang-khong-thanh-cong.html");
             }
+        }
+
+        [Authorize]
+        public IActionResult PaymentCallBack()
+        {
+            var response = _vnPayservice.PaymentExecute(Request.Query);
+
+            if (response == null || response.VnPayResponseCode != "00")
+            {
+                TempData["Message"] = $"Lỗi thanh toán VN Pay: {response.VnPayResponseCode}";
+                return RedirectToAction("Fail");
+            }
+
+            // Lưu đơn hàng vô database
+
+            TempData["Message"] = $"Thanh toán VNPay thành công";
+            return RedirectToAction("Success");
         }
     }
 }
