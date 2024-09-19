@@ -120,6 +120,13 @@ namespace LaptopShop.Controllers
         {
             try
             {
+                // Lưu dữ liệu vào TempData trước khi chuyển hướng đến VNPay
+                TempData["FullName"] = muahang.FullName;
+                TempData["Address"] = muahang.Address;
+                TempData["Phone"] = muahang.Phone;
+                TempData["Note"] = muahang.Note;
+                TempData["Email"] = muahang.Email;
+
                 string paymentMethod = Request.Form["PaymentMethod"];
                 if(paymentMethod == "VnPay")
                 {
@@ -210,6 +217,94 @@ namespace LaptopShop.Controllers
                 return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
         }
+
+        //[Authorize]
+        //public IActionResult PaymentCallBack()
+        //{
+        //    var response = _vnPayservice.PaymentExecute(Request.Query);
+
+        //    if (response == null || response.VnPayResponseCode != "00")
+        //    {
+        //        TempData["Message"] = $"Lỗi thanh toán VN Pay: {response.VnPayResponseCode}";
+        //        return RedirectToAction("Fail");
+        //    }
+
+        //    // Lưu đơn hàng vô database
+
+        //    TempData["Message"] = $"Thanh toán VNPay thành công";
+        //    return RedirectToAction("Success");
+        //}
+        [Authorize]
+        public IActionResult PaymentCallBack()
+        {
+            var response = _vnPayservice.PaymentExecute(Request.Query);
+
+            if (response == null || response.VnPayResponseCode != "00")
+            {
+                TempData["Message"] = $"Lỗi thanh toán VN Pay: {response.VnPayResponseCode}";
+                return RedirectToAction("Fail");
+            }
+
+            // Lấy accountID của người dùng
+            var accountID = User.Identity.GetAccountID();
+            if (!string.IsNullOrEmpty(accountID))
+            {
+                // Lấy thông tin giỏ hàng của người dùng
+                var cart = _context.Carts
+                    .Include(c => c.Product)
+                    .Where(c => c.UserId == accountID)
+                    .ToList();
+
+                // Tạo đơn hàng mới
+                var donhang = new Models.Order
+                {
+                    UserId = accountID,
+                    RecipientName = TempData["FullName"]?.ToString(),
+                    Address = TempData["Address"]?.ToString(),
+                    Phone = TempData["Phone"]?.ToString(),
+                    OrderDate = DateTime.Now,
+                    Note = TempData["Note"]?.ToString(),
+                    StatusId = 4,
+                    Total = Convert.ToInt32(cart.Sum(x => x.TotalMoney))
+                };
+
+                _context.Add(donhang);
+                _context.SaveChanges();
+
+                // Thêm chi tiết đơn hàng cho từng sản phẩm trong giỏ hàng
+                foreach (var item in cart)
+                {
+                    var orderDetail = new OrderDetail
+                    {
+                        OrderId = donhang.OrderId,
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        Price = item.Product.Price
+                    };
+
+                    _context.Add(orderDetail);
+
+                    // Cập nhật số lượng tồn kho của sản phẩm
+                    var product = _context.Products.Find(item.ProductId);
+                    if (product != null)
+                    {
+                        product.Instock -= item.Quantity;
+                        _context.Products.Update(product);
+                    }
+                }
+
+                // Lưu tất cả thay đổi vào cơ sở dữ liệu
+                _context.SaveChanges();
+
+                // Hiển thị thông báo thành công
+                TempData["Message"] = "Thanh toán VNPay thành công";
+                return RedirectToAction("Success");
+            }
+
+            TempData["Message"] = "Có lỗi xảy ra trong quá trình xử lý thanh toán.";
+            return RedirectToAction("Fail");
+        }
+
 
         [Route("dat-hang-thanh-cong.html", Name = "Success")]
         public IActionResult Success()
@@ -413,23 +508,6 @@ namespace LaptopShop.Controllers
 
                 return Redirect("/dat-hang-khong-thanh-cong.html");
             }
-        }
-
-        [Authorize]
-        public IActionResult PaymentCallBack()
-        {
-            var response = _vnPayservice.PaymentExecute(Request.Query);
-
-            if (response == null || response.VnPayResponseCode != "00")
-            {
-                TempData["Message"] = $"Lỗi thanh toán VN Pay: {response.VnPayResponseCode}";
-                return RedirectToAction("Fail");
-            }
-
-            // Lưu đơn hàng vô database
-
-            TempData["Message"] = $"Thanh toán VNPay thành công";
-            return RedirectToAction("Success");
         }
     }
 }
