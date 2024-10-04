@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using LaptopShop;
 using LaptopShop.Services;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
-
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<laptopWebContext>(options =>

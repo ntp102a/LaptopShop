@@ -42,10 +42,6 @@
                         <div class="form-group month-select">
                             <label for="monthSelect">Chọn tháng:</label>
                             <select id="monthSelect" class="form-control">
-                                @for (int month = 1; month <= 12; month++)
-                                {
-                                    <option value="@month">@month</option>
-                                }
                             </select>
                         </div>
                     </div>
@@ -66,6 +62,7 @@
                             <button id="exportButton" class="btn btn-primary btn-block">Thống Kê</button>
                         </div>
                     </div>
+
                 </div>
                 <div class="row">
                     <div class="col-md-4 col-lg-4">
@@ -128,9 +125,40 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-md-4">
+                        <div class="mt-3">
+                            <button id="exportExcelButtonTotal" class="btn btn-success">
+                                <i class="anticon anticon-file-excel"></i> Xuất File Excel Tổng Doanh Thu
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bootstrap Modal -->
+                    <div class="modal fade" id="exportChartModal" tabindex="-1" role="dialog" aria-labelledby="exportChartModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exportChartModalLabel">Xác nhận xuất file Excel với biểu đồ</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Bạn có chắc chắn muốn xuất file Excel với biểu đồ không?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                    <button type="button" id="exportWithChart" class="btn btn-primary">Xuất với Biểu Đồ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <div class="row">
                         <div class="col-md-12">
-                            <canvas id="revenueChart" width="800" height="400"></canvas>
+                            <canvas id="revenueChart" width="1200" height="400"></canvas>
                         </div>
                     </div>
                 </div>
@@ -407,18 +435,7 @@
             monthSelect.add(option);
         }
         monthSelect.value = currentMonth; // Đặt giá trị mặc định
-
-        // Ô chọn ngày
-        // var daySelect = document.getElementById('daySelect');
-        // for (var day = 1; day <= 31; day++) {
-        //     var option = document.createElement('option');
-        //     option.value = day;
-        //     option.text = day;
-        //     daySelect.add(option);
-        // }
-        // daySelect.value = currentDay; // Đặt giá trị mặc định
     }
-
 
     $(document).ready(function () {
         // Disable ban đầu khi trang tải
@@ -439,6 +456,51 @@
         populateDateFields();
         setupExportButton();
     });
+    //Xuất File Excel Tổng Doanh Thu(Năm)
+    // Show the Bootstrap modal when the button is clicked
+    document.getElementById('exportExcelButtonTotal').addEventListener('click', function () {
+        $('#exportChartModal').modal('show'); // Use jQuery to show the modal
+    });
+
+    // Export with Chart when the button in the modal is clicked
+    document.getElementById('exportWithChart').addEventListener('click', function () {
+        var year = document.getElementById('yearSelect').value; // Assuming there's a select input for year
+        exportExcelWithChart(year); // Call the function to export the file
+    });
+
+    // Function to export Excel with a chart
+    function exportExcelWithChart(year) {
+        fetch(`/Admin/AdminRevenue/ExportDataToExcel?year=${year}&chartType=chart`, {
+            method: 'GET',
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    throw new Error('Error exporting data');
+                }
+            })
+            .then(blob => {
+                // Create a link element for file download
+                var link = document.createElement('a');
+                var url = window.URL.createObjectURL(blob);
+                link.href = url;
+                link.download = `RevenueReport_${year}.xlsx`; // Set the filename
+                link.click();
+                window.URL.revokeObjectURL(url); // Cleanup the URL object
+            })
+            .catch(error => {
+                console.error('Error downloading Excel file:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: 'Xuất file Excel thất bại!',
+                });
+            });
+
+        // Close the modal after exporting
+        $('#exportChartModal').modal('hide'); // Use jQuery to hide the modal
+    }
 
 
 </script>
