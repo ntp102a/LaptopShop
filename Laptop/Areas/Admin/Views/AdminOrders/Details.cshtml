@@ -69,7 +69,7 @@
                                     int i = 1;
                                     foreach (var item in orderDetails)
                                     {
-                                        string url = $"/Product/Details/{item.ProductId}";
+                                        string url = $"/san-pham/{item.Product.ProductName}";
                                         <tr>
                                             <th>@i</th>
                                             <td><a href="@url">@item.Product.ProductName</a></td>

@@ -66,7 +66,7 @@ namespace LaptopShop.Controllers
         //GET: Checkout/Index
         [Authorize]
         [HttpGet]
-        [Route("checkout.html", Name = "Checkout")]
+        [Route("/thanh-toan", Name = "Checkout")]
         public IActionResult Index()
         {
             try
@@ -115,7 +115,7 @@ namespace LaptopShop.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("checkout.html", Name = "Index")]
+        [Route("/thanh-toan", Name = "Index")]
         public IActionResult Index(MuaHangVM muahang)
         {
             try
@@ -235,6 +235,7 @@ namespace LaptopShop.Controllers
         //    return RedirectToAction("Success");
         //}
         [Authorize]
+        [Route("/Callback")]
         public IActionResult PaymentCallBack()
         {
             var response = _vnPayservice.PaymentExecute(Request.Query);
@@ -306,7 +307,7 @@ namespace LaptopShop.Controllers
         }
 
 
-        [Route("dat-hang-thanh-cong.html", Name = "Success")]
+        [Route("dat-hang-thanh-cong", Name = "Success")]
         public IActionResult Success()
         {
             try
@@ -349,7 +350,7 @@ namespace LaptopShop.Controllers
             }
         }
 
-        [Route("dat-hang-khong-thanh-cong.html", Name = "Fail")]
+        [Route("dat-hang-khong-thanh-cong", Name = "Fail")]
         public IActionResult Fail()
         {
             //Tạo đơn hàng trong database với trạng thái thanh toán là "Chưa thanh toán"
@@ -419,8 +420,8 @@ namespace LaptopShop.Controllers
             },
                     RedirectUrls = new RedirectUrls()
                     {
-                        CancelUrl = $"{hostname}/dat-hang-khong-thanh-cong.html",
-                        ReturnUrl = $"{hostname}/dat-hang-thanh-cong.html"
+                        CancelUrl = $"{hostname}/dat-hang-khong-thanh-cong",
+                        ReturnUrl = $"{hostname}/dat-hang-thanh-cong"
                     },
                     Payer = new Payer()
                     {
@@ -506,7 +507,7 @@ namespace LaptopShop.Controllers
                 var statusCode = httpException.StatusCode;
                 var debugId = httpException.Headers.GetValues("PayPal-Debug-Id").FirstOrDefault();
 
-                return Redirect("/dat-hang-khong-thanh-cong.html");
+                return Redirect("/dat-hang-khong-thanh-cong");
             }
         }
     }

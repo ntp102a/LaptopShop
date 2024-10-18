@@ -123,7 +123,7 @@ namespace LaptopShop.Controllers
         }
 
         [Authorize]
-        [Route("cart.html", Name = "Cart")]
+        [Route("/gio-hang", Name = "Cart")]
         public IActionResult Index()
         {
             var userId = User.Identity.GetAccountID();

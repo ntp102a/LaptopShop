@@ -82,7 +82,7 @@
                 <div id="productList" class="row">
                     @foreach (var item in Model)
                     {
-                        string url = $"/Product/Details/{item.ProductId}";
+                        string url = $"/san-pham/{item.ProductName}";
                         decimal oldPrice = item.Price ?? 0; // Giá cũ (nếu null, mặc định là 0)
                         decimal discount = item.Discount ?? 0; // Tỷ lệ giảm giá (nếu null, mặc định là 0)
                         decimal newPrice = oldPrice - (oldPrice * discount / 100); // Giá mới
@@ -175,41 +175,11 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $(function () {
-                $(".add-to-cart-btn").click(function () {
-                    var productid = $(this).find("input").val();
-                    $.ajax({
-                        url: '/api/cart/add',
-                        type: "POST",
-                        dataType: "JSON",
-                        data: {
-                            productID: productid
-                        },
-                        success: function (response) {
-                            if (response.result == 'Redirect') {
-                                window.location = response.url;
-                            }
-                            else {
-                                loadHeaderCart();
-                                location.reload();
-                            }
-                            console.log(response);
-                        },
-                        error: function (error) {
-                            alert("Lỗi đẩy dữ liệu lên server" + error.responseText);
-                        }
-                    });
-                });
-            });
             
-            function loadHeaderCart() {
-                $("#headerCart").load("/AjaxContent/HeaderCart");
-            }
-
             $("#pageSizeSelect").change(function () {
                 var selectedPageSize = $(this).val();
                 var selectedSort = $("#sortSelect").val();
-                var url = '/shop.html?page=1&pagesize=' + selectedPageSize + '&sort=' + selectedSort;
+                var url = '/tat-ca-san-pham?page=1&pagesize=' + selectedPageSize + '&sort=' + selectedSort;
                 localStorage.setItem('selectedPageSize', selectedPageSize);
                 window.location.href = url;
             });
@@ -220,7 +190,7 @@
             $("#sortSelect").change(function () {
                 var selectedSort = $(this).val();
                 var selectedPageSize = $("#pageSizeSelect").val();
-                var url = '/shop.html?page=1&pagesize=' + selectedPageSize + '&sort=' + selectedSort;
+                var url = '/tat-ca-san-pham?page=1&pagesize=' + selectedPageSize + '&sort=' + selectedSort;
                 localStorage.setItem('selectedSort', selectedSort);
                 window.location.href = url;
             });

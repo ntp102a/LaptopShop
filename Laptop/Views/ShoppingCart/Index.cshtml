@@ -64,11 +64,11 @@
                                         </ul>
                                         @if (User.Identity.IsAuthenticated)
                                         {
-                                            <a href="/checkout.html" class="btn btn-secondary btn-primary-hover">Thanh toán</a>
+                                            <a href="/thanh-toan" class="btn btn-secondary btn-primary-hover">Thanh toán</a>
                                         }
                                         else
                                         {
-                                            <a href="/dang-nhap.html?returnUrl=/checkout.html" class="btn btn-secondary btn-primary-hover">Thanh toán</a>
+                                            <a href="/dang-nhap?returnUrl=/thanh-toan" class="btn btn-secondary btn-primary-hover">Thanh toán</a>
 
                                         }
 
@@ -107,7 +107,7 @@
                     success: function (result) {
                         if (result.success) {
                             loadHeaderCart();
-                            window.location = 'cart.html';
+                            window.location = '/gio-hang';
                             location.reload();
                         }
                     },
@@ -130,7 +130,7 @@
                     success: function (result) {
                         if (result.success) {
                             loadHeaderCart();
-                            window.location = 'cart.html';
+                            window.location = '/gio-hang';
                         }
                     },
                     error: function (rs) {

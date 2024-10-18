@@ -3,7 +3,7 @@
 {
     @foreach (var item in Model)
     {
-        string url = $"/Product/Details/{item.ProductId}";
+        string url = $"/san-pham/{item.ProductName}";
         //string url = Url.RouteUrl("ProductDetails", new { productname = item.ProductName });
         decimal oldPrice = item.Price ?? 0; // Giá cũ (nếu null, mặc định là 0)
         decimal discount = item.Discount ?? 0; // Tỷ lệ giảm giá (nếu null, mặc định là 0)

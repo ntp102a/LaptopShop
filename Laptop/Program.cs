@@ -17,7 +17,7 @@ builder.Services.AddSession();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(option =>
     {
-        option.LogoutPath = "/dang-nhap.html";
+        option.LogoutPath = "/dang-nhap";
         option.AccessDeniedPath = "/";
     });
 

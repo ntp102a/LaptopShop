@@ -12,20 +12,20 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
 
     <!-- Bootstrap -->
-    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="~/css/bootstrap.min.css" />
 
     <!-- Slick -->
-    <link type="text/css" rel="stylesheet" href="/css/slick.css" />
-    <link type="text/css" rel="stylesheet" href="/css/slick-theme.css" />
+    <link type="text/css" rel="stylesheet" href="~/css/slick.css" />
+    <link type="text/css" rel="stylesheet" href="~/css/slick-theme.css" />
 
     <!-- nouislider -->
-    <link type="text/css" rel="stylesheet" href="/css/nouislider.min.css" />
+    <link type="text/css" rel="stylesheet" href="~/css/nouislider.min.css" />
 
     <!-- Font Awesome Icon -->
-    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/css/font-awesome.min.css">
 
     <!-- Custom stlylesheet -->
-    <link type="text/css" rel="stylesheet" href="/css/style.css" />
+    <link type="text/css" rel="stylesheet" href="~/css/style.css" />
 
 
     <!-- Favicon -->
@@ -42,9 +42,324 @@
     <link rel="stylesheet" href="~/assets/css/plugins/magnific-popup.min.css" />
     <link rel="stylesheet" href="~/assets/css/style.css">
 
+    <style>
+        a.devvn_animation_zoom, a.phone_animation_zoom, a.zalo_animation_zoom {
+            display: block;
+            left: 15px;
+            position: fixed;
+            border-radius: 50%;
+            -moz-border-radius: 50%;
+            -webkit-border-radius: 50%;
+            padding: 15px;
+            z-index: 9999;
+            -webkit-animation: devvn_zoom 1s infinite linear;
+            -moz-animation: devvn_zoom 1s infinite linear;
+            -o-animation: devvn_zoom 1s infinite linear;
+            animation: devvn_zoom 1s infinite linear;
+        }
 
+        a.zalo_animation_zoom {
+            background: rgba(33,150,243,0.7);
+            bottom: 28%;
+            box-shadow: 0 0 0 0 #2196F3;
+        }
 
+        a.devvn_animation_zoom {
+            background: rgb(106 79 254 / 50%);
+            bottom: 15%;
+            box-shadow: 0 0 0 0 #6a4ffe;
+        }
 
+        a.phone_animation_zoom {
+            background: #ff3a3a;
+            bottom: 2%;
+            box-shadow: 0 0 0 0 #ff3a3a;
+        }
+
+            a.devvn_animation_zoom img, a.zalo_animation_zoom img, a.phone_animation_zoom img {
+                width: 35px;
+                height: 35px;
+                -webkit-animation: calltrap_spin 2s infinite linear;
+                -moz-animation: calltrap_spin 2s infinite linear;
+                -o-animation: calltrap_spin 2s infinite linear;
+                animation: calltrap_spin 2s infinite linear
+            }
+
+        @@-webkit-keyframes devvn_zoom {
+            70% {
+                box-shadow: 0 0 0 15px transparent
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 transparent
+            }
+        }
+
+        @@keyframes devvn_zoom {
+            70% {
+                box-shadow: 0 0 0 15px transparent
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 transparent
+            }
+        }
+
+        @@-webkit-keyframes calltrap_spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+
+            30% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+
+            33% {
+                -webkit-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            36% {
+                -webkit-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            39% {
+                -webkit-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            42% {
+                -webkit-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            45% {
+                -webkit-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            48% {
+                -webkit-transform: rotate(10deg);
+                transform: rotate(10deg);
+                opacity: 1
+            }
+
+            51% {
+                -webkit-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            54% {
+                -webkit-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            57% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+        }
+
+        @@-moz-keyframes calltrap_spin {
+            0% {
+                -moz-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+
+            30% {
+                -moz-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+
+            33% {
+                -moz-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            36% {
+                -moz-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            39% {
+                -moz-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            42% {
+                -moz-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            45% {
+                -moz-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            48% {
+                -moz-transform: rotate(10deg);
+                transform: rotate(10deg);
+                opacity: 1
+            }
+
+            51% {
+                -moz-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            54% {
+                -moz-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            57% {
+                -moz-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+        }
+
+        @@-o-keyframes calltrap_spin {
+            0% {
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+
+            30% {
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+
+            33% {
+                -o-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            36% {
+                -o-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            39% {
+                -o-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            42% {
+                -o-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            45% {
+                -o-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            48% {
+                -o-transform: rotate(10deg);
+                transform: rotate(10deg);
+                opacity: 1
+            }
+
+            51% {
+                -o-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            54% {
+                -o-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            57% {
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+        }
+
+        @@keyframes calltrap_spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+
+            30% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+
+            33% {
+                -webkit-transform: rotate(-10deg);
+                -moz-transform: rotate(-10deg);
+                -o-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            36% {
+                -webkit-transform: rotate(10deg);
+                -moz-transform: rotate(10deg);
+                -o-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            39% {
+                -webkit-transform: rotate(-10deg);
+                -moz-transform: rotate(-10deg);
+                -o-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            42% {
+                -webkit-transform: rotate(10deg);
+                -moz-transform: rotate(10deg);
+                -o-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            45% {
+                -webkit-transform: rotate(-10deg);
+                -moz-transform: rotate(-10deg);
+                -o-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            48% {
+                -webkit-transform: rotate(10deg);
+                -moz-transform: rotate(10deg);
+                -o-transform: rotate(10deg);
+                transform: rotate(10deg);
+                opacity: 1
+            }
+
+            51% {
+                -webkit-transform: rotate(-10deg);
+                -moz-transform: rotate(-10deg);
+                -o-transform: rotate(-10deg);
+                transform: rotate(-10deg)
+            }
+
+            54% {
+                -webkit-transform: rotate(10deg);
+                -moz-transform: rotate(10deg);
+                -o-transform: rotate(10deg);
+                transform: rotate(10deg)
+            }
+
+            57% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg)
+            }
+        }
+
+    </style>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -62,10 +377,20 @@
     <!-- FOOTER -->
     @await Html.PartialAsync("_FooterPartialView.cshtml")
     <!-- /FOOTER -->
-    <!-- Global Vendor, plugins JS -->
-    <!-- JS Files
-    ============================================ -->
-    <!-- Global Vendor, plugins JS -->
+
+
+    <a href="https://www.messenger.com/e2ee/t/6524120987716915" title="Messenger" class="devvn_animation_zoom" target="_blank" rel="noopener nofollow">
+        <img width="35" height="35" src="@Url.Content("~/img/logo-512.webp")" alt="" loading="lazy">
+    </a>
+
+    <a href="https://zalo.me/0336960995" title="Zalo" class="zalo_animation_zoom" target="_blank" rel="noopener nofollow">
+        <img width="35" height="35" src="@Url.Content("~/img/img.webp")" alt="" loading="lazy">
+    </a>
+
+    <a href="tel:+84336960995" title="Phone" class="phone_animation_zoom" target="_blank" rel="noopener nofollow">
+        <img width="35" height="35" src="@Url.Content("~/img/phone-icon-800x800.png")" alt="" loading="lazy">
+    </a>
+
     <!-- Vendor JS -->
     <script src="~/assets/js/vendor/bootstrap.bundle.min.js"></script>
     <script src="~/assets/js/vendor/jquery-3.5.1.min.js"></script>
@@ -115,7 +440,7 @@
                 data.forEach(function (categoryItem) {
                     var category = categoryItem.category;
                     var option = $('<option>', {
-                        value: category.CategoryId,
+                        value: category.CategoryName,
                         text: category.CategoryName
                     });
                     selectElement.append(option);
@@ -132,20 +457,20 @@
 
         // Lắng nghe sự kiện thay đổi của thẻ select
         selectElement.on('change', function () {
-            var selectedCategoryId = $(this).val(); // Lấy giá trị được chọn
+            var selectedCategoryName = $(this).find('option:selected').text(); // Lấy tên danh mục được chọn
 
-            if (selectedCategoryId !== '0' && selectedCategoryId !== 'all') { // Kiểm tra nếu đã chọn một danh mục khác "All Categories"
-                // Chuyển hướng đến trang sản phẩm cụ thể dựa trên CategoryId
-                var url = '/Product/List/' + selectedCategoryId;
+            if (selectedCategoryName !== 'Chọn để lọc' && selectedCategoryName !== 'Tất cả') {
+                // Chuyển hướng đến trang sản phẩm cụ thể dựa trên CategoryName
+                var url = '/danh-muc/' + selectedCategoryName;
                 window.location.href = url;
             }
-            if (selectedCategoryId == 'all') {
-                var url = "/shop.html";
+            if (selectedCategoryName === 'Tất cả') {
+                var url = "/tat-ca-san-pham";
                 window.location.href = url;
             }
         });
-        selectElement.append(defaultOption);
     });
+
 
     $(document).ready(function () {
         // Sử dụng sự kiện khi nút tìm kiếm được nhấn
@@ -171,7 +496,7 @@
 
     $(document).ready(function () {
         function clearLocalStorage() {
-            if (window.location.href.indexOf('/shop.html') === -1) {
+            if (window.location.href.indexOf('/tat-ca-san-pham') === -1) {
                 localStorage.removeItem('selectedPageSize');
                 localStorage.removeItem('selectedSort');
             }
@@ -179,4 +504,36 @@
         window.onbeforeunload = clearLocalStorage;
     });
 
+    $(document).ready(function () {
+        $(function () {
+            $(".add-to-cart-btn").click(function () {
+                var productid = $(this).find("input").val();
+                $.ajax({
+                    url: '/api/cart/add',
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        productID: productid
+                    },
+                    success: function (response) {
+                        if (response.result == 'Redirect') {
+                            window.location = response.url;
+                        }
+                        else {
+                            loadHeaderCart();
+                            location.reload();
+                        }
+                        console.log(response);
+                    },
+                    error: function (error) {
+                        alert("Lỗi đẩy dữ liệu lên server" + error.responseText);
+                    }
+                });
+            });
+        });
+
+        function loadHeaderCart() {
+            $("#headerCart").load("/AjaxContent/HeaderCart");
+        }
+    });
 </script>

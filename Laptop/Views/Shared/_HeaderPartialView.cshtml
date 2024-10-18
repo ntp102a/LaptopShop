@@ -11,12 +11,12 @@
 
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <li><a class="dropdown-item" href="/tai-khoan-cua-toi.html">Tài khoản</a></li>
+                    <li><a class="dropdown-item" href="/tai-khoan-cua-toi">Tài khoản</a></li>
                 }
                 else
                 {
-                    <li><a class="dropdown-item" href="/dang-nhap.html">Đăng nhập</a></li>
-                    <li><a class="dropdown-item" href="/dang-ky.html">Đăng ký</a></li>
+                    <li><a class="dropdown-item" href="/dang-nhap">Đăng nhập</a></li>
+                    <li><a class="dropdown-item" href="/dang-ky">Đăng ký</a></li>
 
                 }
             </ul>
@@ -46,7 +46,7 @@
                                 <!-- List categories lấy = js -->
                             </select>
                             <input id="keyword" name="keyword" class="input" placeholder="Tìm kiếm sản phẩm">
-                            <button class="search-btn" type="submit">Search</button>
+                            <button class="search-btn" type="submit">Tìm kiếm</button>
                         </form>
                     </div>
                 </div>
@@ -63,14 +63,6 @@
                             }
                         </div>
                         <!-- /Cart -->
-                        <!-- Menu Toogle -->
-                        <div class="menu-toggle">
-                            <a href="#">
-                                <i class="fa fa-bars"></i>
-                                <span>Menu</span>
-                            </a>
-                        </div>
-                        <!-- /Menu Toogle -->
                     </div>
                 </div>
                 <!-- /ACCOUNT -->
