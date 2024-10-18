@@ -14,7 +14,7 @@ namespace LaptopShop.Controllers
             _context = context;
         }
 
-        [Route("shop.html", Name = "ShopProduct")]
+        [Route("/tat-ca-san-pham", Name = "ShopProduct")]
         public IActionResult Index(int? page, int? pagesize, int? sort)
         {
             try
@@ -61,7 +61,8 @@ namespace LaptopShop.Controllers
             }
         }
 
-        public IActionResult List(int id, int page = 1, int pagesize = 0, int sort = 0)
+        [Route("/danh-muc/{name}")]
+        public IActionResult List(string name, int page = 1, int pagesize = 0, int sort = 0)
         {
             try
             {
@@ -72,7 +73,7 @@ namespace LaptopShop.Controllers
                 }
                 var danhmuc = _context.Categories
                     .AsNoTracking()
-                    .SingleOrDefault(x => x.CategoryId == id);
+                    .SingleOrDefault(x => x.CategoryName == name);
                 IQueryable<Product> lsPages;
                 if (sort == 0)
                 {
@@ -80,7 +81,7 @@ namespace LaptopShop.Controllers
                     .Include(p => p.Image)
                     .Include(p => p.Category)
                     .Include(p => p.Info)
-                    .Where(p => p.CategoryId == id)
+                    .Where(p => p.Category.CategoryName == name)
                     .AsNoTracking()
                     .OrderByDescending(x => x.Info.Date);
                 }
@@ -90,7 +91,7 @@ namespace LaptopShop.Controllers
                     .Include(p => p.Image)
                     .Include(p => p.Category)
                     .Include(p => p.Info)
-                    .Where(p => p.CategoryId == id)
+                    .Where(p => p.ProductName == name)
                     .AsNoTracking()
                     .OrderBy(x => x.Price);
                 }
@@ -100,7 +101,7 @@ namespace LaptopShop.Controllers
                     .Include(p => p.Image)
                     .Include(p => p.Category)
                     .Include(p => p.Info)
-                    .Where(p => p.CategoryId == id)
+                    .Where(p => p.Category.CategoryName == name)
                     .AsNoTracking()
                     .OrderByDescending(x => x.Price);
                 }
@@ -120,8 +121,8 @@ namespace LaptopShop.Controllers
             }
         }
 
-        //[Route("Products/{id}", Name ="Products")]
-        public IActionResult Details(int id)
+        [Route("/san-pham/{name}", Name ="Products")]
+        public IActionResult Details(string name)
         {
             try
             {
@@ -129,7 +130,7 @@ namespace LaptopShop.Controllers
                     .Include(p => p.Image)
                     .Include(p => p.Info)
                     .Include(p => p.Category)
-                    .FirstOrDefault(x => x.ProductId == id);
+                    .FirstOrDefault(x => x.ProductName == name);
                 if (product == null)
                 {
                     return RedirectToAction("Index");
@@ -140,7 +141,7 @@ namespace LaptopShop.Controllers
                     .Include(p => p.Image)
                     .Include(p => p.Info)
                     .Include(p => p.Category)
-                    .Where(x => x.CategoryId == product.CategoryId && x.ProductId != id)
+                    .Where(x => x.CategoryId == product.CategoryId && x.ProductName != name)
                     .OrderByDescending(x => x.Price)
                     .Take(4)
                     .ToList();

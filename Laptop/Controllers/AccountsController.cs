@@ -72,7 +72,7 @@ namespace LaptopShop.Controllers
         }
 
         [Authorize]
-        [Route("tai-khoan-cua-toi.html", Name = "Dashboard")]
+        [Route("/tai-khoan-cua-toi", Name = "Dashboard")]
         public IActionResult Dashboard()
         {
             var taikhoanID = HttpContext.Session.GetString("UserId");
@@ -96,14 +96,14 @@ namespace LaptopShop.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        [Route("dang-ky.html", Name = "DangKy")]
+        [Route("/dang-ky", Name = "DangKy")]
         public IActionResult DangkyTaiKhoan()
         {
             return View();
         }
         [HttpPost]
         [AllowAnonymous]
-        [Route("dang-ky.html", Name = "DangKy")]
+        [Route("/dang-ky", Name = "DangKy")]
         public async Task<IActionResult> DangkyTaiKhoan(RegisterVM taikhoan)
         {
             try
@@ -165,7 +165,7 @@ namespace LaptopShop.Controllers
         }
 
         [AllowAnonymous]
-        [Route("dang-nhap.html", Name = "DangNhap")]
+        [Route("/dang-nhap", Name = "DangNhap")]
         public IActionResult Login(string returnUrl = null)
         {
             var taikhoanID = HttpContext.Session.GetString("UserId");
@@ -180,7 +180,7 @@ namespace LaptopShop.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [Route("dang-nhap.html", Name = "DangNhap")]
+        [Route("/dang-nhap", Name = "DangNhap")]
         public async Task<IActionResult> Login(LoginViewModel customer, string returnUrl = null)
         {
             try
@@ -239,7 +239,7 @@ namespace LaptopShop.Controllers
         }
 
         [HttpGet]
-        [Route("dang-xuat.html", Name = "Logout")]
+        [Route("/dang-xuat", Name = "Logout")]
         public IActionResult Logout()
         {
             HttpContext.SignOutAsync();

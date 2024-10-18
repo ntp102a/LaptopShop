@@ -63,7 +63,7 @@
                     {
                         @foreach (var item in Model)
                         {
-                            string url = $"/Product/Details/{item.ProductId}";
+                            string url = $"/san-pham/{item.ProductName}";
                             decimal oldPrice = item.Price ?? 0; // Giá cũ (nếu null, mặc định là 0)
                             decimal discount = item.Discount.HasValue ? item.Discount.Value : 0;
 
@@ -134,39 +134,3 @@
         height: 40px;
     }
 </style>
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $(function () {
-                $(".add-to-cart-btn").click(function () {
-                    var productid = $(this).find("input").val();
-                    $.ajax({
-                        url: '/api/cart/add',
-                        type: "POST",
-                        dataType: "JSON",
-                        data: {
-                            productID: productid
-                        },
-                        success: function (response) {
-                            if (response.result == 'Redirect') {
-                                window.location = response.url;
-                            }
-                            else {
-                                loadHeaderCart();
-                                location.reload();
-                            }
-                            console.log(response);
-                        },
-                        error: function (error) {
-                            alert("Lỗi đẩy dữ liệu lên server" + error.responseText);
-                        }
-                    });
-                });
-            });
-
-            function loadHeaderCart() {
-                $("#headerCart").load("/AjaxContent/HeaderCart");
-            }
-        });
-    </script>
-}

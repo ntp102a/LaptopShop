@@ -25,7 +25,7 @@ namespace LaptopShop.Controllers
             List<ProductHomeVM> lsProductViews = new List<ProductHomeVM>();
             var lsCats = _context.Categories
                 .AsNoTracking()
-                .OrderByDescending(x => x.CategoryId)
+                .OrderByDescending(x => x.CategoryName)
                 .ToList();
 
             foreach (var item in lsCats)
