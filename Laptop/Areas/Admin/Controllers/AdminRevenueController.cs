@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LaptopShop.Models;
+using OfficeOpenXml;
+using System.IO;
+using OfficeOpenXml.Drawing.Chart;
 
 namespace LaptopShop.Areas.Admin.Controllers
 {
@@ -111,6 +114,103 @@ namespace LaptopShop.Areas.Admin.Controllers
 
             return Json(responseData);
         }
+
+        public IActionResult ExportDataToExcel(int year)
+        {
+            try
+            {
+                var monthlyRevenue = new Dictionary<int, decimal>();
+                for (int month = 1; month <= 12; month++)
+                {
+                    monthlyRevenue[month] = 0; // Default revenue is 0
+                }
+                var monthlyDatalist = _context.Orders
+                    .Where(o => o.StatusId == 2 || o.StatusId == 5) // Filter by status
+                    .Where(o => o.OrderDate.HasValue && o.OrderDate.Value.Year == year)
+                    .GroupBy(o => o.OrderDate.Value.Month)
+                    .Select(g => new
+                    {
+                        Month = g.Key,
+                        Total = g.Sum(o => o.Total) // Total revenue for the month
+                    })
+                    .ToList();
+
+                // Populate the dictionary with actual revenue data
+                foreach (var data in monthlyDatalist)
+                {
+                    monthlyRevenue[data.Month] = (decimal)data.Total; // Assign the revenue to the respective month
+                }
+
+                using (var package = new ExcelPackage())
+                {
+                    var worksheet = package.Workbook.Worksheets.Add("Revenue Report");
+
+                    // Header
+                    worksheet.Cells[1, 1].Value = "Tháng";
+                    worksheet.Cells[1, 2].Value = "Doanh Thu";
+
+                    // Data
+                    int row = 2;
+                    for (int month = 1; month <= 12; month++)
+                    {
+                        worksheet.Cells[row, 1].Value = month; // Month
+                        worksheet.Cells[row, 2].Value = monthlyRevenue[month]; // Revenue as a decimal
+
+                        worksheet.Cells[row, 2].Style.Numberformat.Format = "#,##0.00";
+
+                        // Format Header
+                        worksheet.Cells[1, 1, 1, 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center; // Center alignment
+                        worksheet.Cells[1, 1, 1, 2].Style.Font.Bold = true;
+                        worksheet.Cells[1, 1, 1, 2].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                        worksheet.Cells[1, 1, 1, 2].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue);
+
+                        worksheet.Column(1).Width = 15;
+                        worksheet.Column(2).Width = 30;
+
+                        // Kẻ viền
+                        worksheet.Cells[row, 1, row, 2].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+
+                        // Format data rows
+                        worksheet.Cells[row, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                        worksheet.Cells[row, 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                        // Fill colors
+                        worksheet.Cells[row, 1, row, 2].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                        worksheet.Cells[row, 1, row, 2].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                        row++;
+                    }
+
+                    var chart = worksheet.Drawings.AddChart("RevenueChart", OfficeOpenXml.Drawing.Chart.eChartType.BarClustered); 
+                    chart.Title.Text = "Doanh Thu Theo Tháng";
+                    chart.SetPosition(row + 2, 0, 0, 0); 
+                    chart.SetSize(1200, 600); 
+
+                    // Specify the data for the chart
+                    var series = chart.Series.Add(worksheet.Cells[2, 2, 13, 2], worksheet.Cells[2, 1, 13, 1]); 
+                                                                                                               
+
+                    // Export to memory stream
+                    var stream = new MemoryStream();
+                    package.SaveAs(stream);
+                    stream.Position = 0;
+
+                    var fileName = $"RevenueReport_{year}_{DateTime.Now:yyyyMMddHHmmss}.xlsx"; 
+                    return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ExportDataToExcel: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+
+
+
+
+
 
 
 
