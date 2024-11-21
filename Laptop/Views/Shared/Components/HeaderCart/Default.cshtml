@@ -7,9 +7,9 @@
             {
                 string url = $"/san-pham/{item.Product.ProductName}";
                 <div class="product-widget">
-                    @*<div class="product-img">
-            <img href="@url" src="~/images/products/@item.product.Image.ImageThumb" alt="">
-            </div>*@
+                    <div class="product-img">
+                        <img href="@url" src="~/images/products/@item.Product.Image.ImageThumb" alt="">
+                    </div>
                     <div class="product-body">
                         <h3 class="product-name"><a href="@url">@item.Product.ProductName</a></h3>
                         <h4 class="product-price"><span class="qty">x @item.Quantity</span>@item.Product.Price.Value.ToString("#, ##0") VNĐ</h4>
