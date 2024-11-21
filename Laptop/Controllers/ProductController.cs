@@ -155,38 +155,5 @@ namespace LaptopShop.Controllers
 
         }
 
-        //[Route("products/{productname}", Name = "ProductDetails")]
-        //public IActionResult Details(string productname)
-        //{
-        //    try
-        //    {
-        //        var product = _context.Products
-        //            .Include(p => p.Image)
-        //            .Include(p => p.Info)
-        //            .Include(p => p.Category)
-        //            .FirstOrDefault(x => x.ProductName == productname); // Giả sử ProductName là một định danh duy nhất
-        //        if (product == null)
-        //        {
-        //            return RedirectToAction("Index");
-        //        }
-
-        //        var lsProduct = _context.Products
-        //            .AsNoTracking()
-        //            .Include(p => p.Image)
-        //            .Include(p => p.Info)
-        //            .Include(p => p.Category)
-        //            .Where(x => x.CategoryId == product.CategoryId && x.ProductName != productname)
-        //            .OrderByDescending(x => x.Price)
-        //            .Take(4)
-        //            .ToList();
-        //        ViewBag.Sanpham = lsProduct;
-        //        return View(product);
-        //    }
-        //    catch
-        //    {
-        //        return RedirectToAction("Index", "Home");
-        //    }
-        //}
-
     }
 }
