@@ -2,10 +2,13 @@
 @model PagedList.Core.IPagedList<LaptopShop.Models.Product>
 
 @{
-    ViewData["Title"] = "Shop - " + ViewBag.CurrentPages;
+    ViewData["Title"] = "Shop - " /*+ ViewBag.CurrentPages*/;
     Layout = "~/Views/Shared/_Layout.cshtml";
-    int PageCurrent = ViewBag.CurrentPages;
-    int NextPage = PageCurrent + 1;
+
+    List<Product> allProducts = ViewBag.lsProduct;
+
+    //int PageCurrent = ViewBag.CurrentPages;
+    //int NextPage = PageCurrent + 1;
 }
 
 <!-- BREADCRUMB -->
@@ -32,10 +35,10 @@
     <div class="container">
         <!-- row -->
         <div class="row">
-            <!-- ASIDE -->
+            <!-- Filter -->
             <div id="aside" class="col-md-3">
-                <!-- aside Widget -->
-                <div class="aside">
+                <!-- Filter theo giá -->
+                @*<div class="aside">
                     <h3 class="aside-title">Price</h3>
                     <div class="price-filter">
                         <div id="price-slider"></div>
@@ -51,7 +54,23 @@
                             <span class="qty-down">-</span>
                         </div>
                     </div>
-                </div>
+                </div>*@
+
+                @*<div class="aside">
+                    <h3 class="aside-title">Hãng</h3>
+                    <div class="checkbox-filter">
+                        @foreach (var item in ViewBag.Categories)
+                        {
+                            <div class="input-checkbox">
+                                <input type="checkbox" id="brand-@item.CategoryId" class="category-checkbox" data-category-id="@item.CategoryId">
+                                <label for="brand-@item.CategoryId">
+                                    <span></span>
+                                    @item.CategoryName
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>*@
 
                 <div class="aside">
                     <h3 class="aside-title">Hãng</h3>
@@ -68,12 +87,13 @@
                         }
                     </div>
                 </div>
+
                 <!-- /aside Widget -->
             </div>
-            <!-- /ASIDE -->
+            <!-- END Filter -->
             <!-- STORE -->
             <div id="store" class="col-md-9">
-                <!-- store top filter -->
+                <!-- Sort -->
                 <div class="store-filter clearfix">
                     <div class="store-sort">
                         <label>
@@ -85,69 +105,26 @@
                             </select>
                         </label>
 
-                        <label>
+                        @*<label>
                             Show:
                             <select id="pageSizeSelect" class="show-select">
                                 <option value="12" selected>12</option>
                                 <option value="20">20</option>
                                 <option value="50">50</option>
                             </select>
-                        </label>
+                        </label>*@
                     </div>
                 </div>
-                <!-- /store top filter -->
-                <!-- store products -->
+                <!-- End Sort -->
+
+                <!-- List Products -->
                 <div id="productList" class="row">
-                    @foreach (var item in Model)
-                    {
-                        string url = $"/san-pham/{item.ProductName}";
-                        decimal oldPrice = item.Price ?? 0; // Giá cũ (nếu null, mặc định là 0)
-                        decimal discount = item.Discount ?? 0; // Tỷ lệ giảm giá (nếu null, mặc định là 0)
-                        decimal newPrice = oldPrice - (oldPrice * discount / 100); // Giá mới
-
-                        string formattedOldPrice = oldPrice.ToString("#,##0") + " VND";
-                        string formattedNewPrice = newPrice.ToString("#,##0") + " VND";
-
-                        <!-- product 1 -->
-                        <div class="col-md-4 col-xs-6 product-item category-@item.CategoryId">
-                            <div class="product">
-                                <div class="product-img">
-                                    <a href="@url">
-                                        <img width="250" height="250" src="/images/products/@item.Image.ImageThumb" alt="">
-                                    </a>
-                                    <div class="product-label">
-                                        @if (discount > 0)
-                                        {
-                                            <span class="sale">-@item.Discount%</span>
-                                        }
-                                    </div>
-                                </div>
-                                <div class="product-body">
-                                    <h3 class="product-name"><a href="@url">@item.ProductName</a></h3>
-                                    <h4 class="product-price">
-                                        @formattedNewPrice @if (discount > 0)
-                                        {
-                                            <del class="product-old-price">@formattedOldPrice</del>
-                                        }
-                                    </h4>
-                                </div>
-                                <div class="add-to-cart">
-                                    <button class="add-to-cart-btn">
-                                        <i class="fa fa-shopping-cart"></i>
-                                        Thêm vào giỏ hàng
-                                        <input hidden asp-for="@item.ProductId" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /product -->
-                        <div class="clearfix visible-sm visible-xs"></div>
-                    }
+                    @await Html.PartialAsync("_ProductsPartialView", allProducts)
                 </div>
 
                 <!-- /store products -->
                 <!-- store bottom filter -->
-                <div class="store-filter clearfix">
+                @*<div class="store-filter clearfix">
                     <ul class="store-pagination">
                         @for (int i = 1; i <= Model.PageCount; i++)
                         {
@@ -163,7 +140,7 @@
                             </li>
                         }
                     </ul>
-                </div>
+                </div>*@
                 <!-- /store bottom filter -->
 
             </div>
@@ -175,6 +152,64 @@
 </div>
 <!-- /SECTION -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.category-checkbox').change(function () {
+                const selectedCategories = [];
+                $('.category-checkbox:checked').each(function () {
+                    selectedCategories.push($(this).data('category-id'));
+                });
+
+                const selectedSort = $('#sortSelect').val();
+
+                $.ajax({
+                    url: '/Product/GetProductData',
+                    type: 'GET',
+                    data: {
+                        categoryIds: selectedCategories,
+                        sort: selectedSort 
+                    },
+                    traditional: true,
+                    success: function (data) {
+                        $('#productList').html(data);
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra khi tải dữ liệu.');
+                    }
+                });
+            });
+
+            $("#sortSelect").change(function () {
+                var selectedSort = $(this).val();
+
+                const selectedCategories = [];
+                $('.category-checkbox:checked').each(function () {
+                    selectedCategories.push($(this).data('category-id'));
+                });
+
+                $.ajax({
+                    url: '/Product/GetProductData',
+                    type: 'GET',
+                    data: {
+                        categoryIds: selectedCategories,
+                        sort: selectedSort
+                    },
+                    traditional: true,
+                    success: function (data) {
+                        $('#productList').html(data);
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra khi tải dữ liệu.');
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
 <style>
     .sort-select {
         padding: 0px 15px;
@@ -190,7 +225,8 @@
         height: 40px;
     }
 </style>
-@section Scripts {
+
+@*@section Scripts {
     <script>
         $(document).ready(function () {
             
@@ -240,4 +276,4 @@
             }
         });
     </script>
-}
+}*@

@@ -10,47 +10,22 @@ namespace LaptopShop.Controllers
 {
     public class HomeController : Controller
     {
-       // private readonly ILogger<HomeController> _logger;
         public readonly laptopWebContext _context;
+        //private readonly RecommendationService _recommendationService;
 
-        public HomeController(/*ILogger<HomeController> logger,*/ laptopWebContext context)
+        public HomeController( laptopWebContext context)
         {
-            //_logger = logger;
             _context = context;
-        }
-
-        // Hàm GetCategories để trả về danh sách danh mục dưới dạng JSON
-        public ActionResult GetCategories()
-        {
-            List<ProductHomeVM> lsProductViews = new List<ProductHomeVM>();
-            var lsCats = _context.Categories
-                .AsNoTracking()
-                .OrderByDescending(x => x.CategoryName)
-                .ToList();
-
-            foreach (var item in lsCats)
-            {
-                ProductHomeVM productHome = new ProductHomeVM();
-                productHome.category = item;
-                lsProductViews.Add(productHome);
-            }
-
-
-            // Sử dụng JsonConvert để chuyển danh sách danh mục thành chuỗi JSON
-            string jsonCategories = JsonConvert.SerializeObject(lsProductViews);
-
-            // Trả về dữ liệu JSON cho yêu cầu
-            return Content(jsonCategories, "application/json");
+            //_recommendationService = new RecommendationService();
         }
 
         public IActionResult Index()
         {
-            HomeViewVM model = new HomeViewVM();
-
             var lsProducts = _context.Products
                 .AsNoTracking()
                 .Include(p => p.Image)
                 .OrderByDescending(x => x.ProductId)
+                .Take(12)
                 .ToList();
 
             //Top Selling
@@ -65,10 +40,53 @@ namespace LaptopShop.Controllers
                         })
                 .Where(p => p.Count > 2)
                 .Select(p => p.ProductId)
+                .Take(12)
                 .ToList();
+
+            //Laptop Game
+            var gameProducts = _context.Products
+                .AsNoTracking()
+                .Include(p => p.Image)
+                .Where(p => p.Description.Contains("game"))
+                .Take(12)
+                .ToList();
+
+            //var taikhoanID = HttpContext.Session.GetString("UserId");
+            //if (taikhoanID != null)
+            //{
+            //    var recommendations = _recommendationService.RecommendForUser(taikhoanID);
+
+            //    List<Product> recomProducts = new List<Product>();
+
+            //    foreach (var recommendation in recommendations)
+            //    {
+            //        var product = _context.Products
+            //            .Include(p => p.Image)
+            //            .Include(p => p.Category)
+            //            .FirstOrDefault(p => p.ProductId == recommendation.ProductId);
+            //        if (product != null)
+            //        {
+            //            var lsProduct = _context.Products.AsNoTracking()
+            //                .Include(p => p.Image)
+            //                .Include(p => p.Category)
+            //                .Where(x => x.CategoryId == product.CategoryId && x.ProductName != product.ProductName)
+            //                .OrderByDescending(x => x.Price)
+            //                .ToList();
+            //            foreach (var pro in lsProduct)
+            //            {
+            //                recomProducts.Add(pro);
+            //            }
+            //        }
+            //    }
+
+            //    ViewBag.RecommendProducts = recomProducts;
+
+            //}
 
             ViewBag.TopProducts = productCounts;
             ViewBag.AllProducts = lsProducts;
+            ViewBag.GameProducts = gameProducts;
+
             return View();
         }
 

@@ -8,7 +8,9 @@
     ViewData["Title"] = "Laptop Shop";
     Layout = "~/Views/Shared/_Layout.cshtml";
     List<Product> allProducts = ViewBag.AllProducts;
-    List<int?> productIds = ViewBag.TopProducts;
+    List<Product> gameProducts = ViewBag.GameProducts;
+    //List<Product> recomProducts = ViewBag.RecommendProducts;
+    List<int> productIds = ViewBag.TopProducts;
     List<Product> topProducts = _context.Products
         .AsNoTracking()
         .Include(p => p.Image)
@@ -40,11 +42,10 @@
                 <div class="row">
                     <div class="products-tabs">
                         <!-- tab -->
-                        <div id="tab1" class="tab-pane active">
-                            <div class="products-slick" data-nav="#slick-nav-1">
+                        <div id="tab1" class="active">
+                            <div class="row">
                                 @await Html.PartialAsync("_ListProductPartialView", allProducts)
                             </div>
-                            <div id="slick-nav-1" class="products-slick-nav"></div>
                         </div>
                         <!-- /tab -->
                     </div>
@@ -68,7 +69,7 @@
             <!-- section title -->
             <div class="col-md-12">
                 <div class="section-title">
-                    <h3 class="title">Top selling</h3>
+                    <h3 class="title">Bán chạy</h3>
                     <div class="section-nav">
                         <ul class="section-tab-nav tab-nav">
                             <li class="active"><a href="/tat-ca-san-pham">Xem thêm</a></li>
@@ -77,21 +78,21 @@
                 </div>
             </div>
             <!-- /section title -->
-            <!-- Products tab & slick -->
+            <!-- Products tab -->
             <div class="col-md-12">
                 <div class="row">
                     <div class="products-tabs">
                         <!-- tab -->
-                        <div id="top-selling" class="tab-pane active">
-                            <div class="products-slick" data-nav="#slick-nav-2">
+                        <div id="tab2" class="active">
+                            <div class="row">
                                 @await Html.PartialAsync("_ListProductPartialView", topProducts)
                             </div>
-                            <div id="slick-nav-2" class="products-slick-nav"></div>
                         </div>
                         <!-- /tab -->
                     </div>
                 </div>
             </div>
+            <!-- /Products tab -->
             <!-- /Products tab & slick -->
         </div>
         <!-- /row -->
@@ -99,3 +100,78 @@
     <!-- /container -->
 </div>
 <!-- END SECTION TOP SELLING -->
+
+
+<!-- SECTION GAME PRODUCT -->
+<div class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+
+            <!-- section title -->
+            <div class="col-md-12">
+                <div class="section-title">
+                    <h3 class="title">Laptop Gaming cho game thủ</h3>
+                    <div class="section-nav">
+                        <ul class="section-tab-nav tab-nav">
+                            <li class="active"><a href="/tat-ca-san-pham">Xem thêm</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /section title -->
+            <!-- Products tab -->
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="products-tabs">
+                        <!-- tab -->
+                        <div class="active">
+                            <div class="row">
+                                @await Html.PartialAsync("_ListProductPartialView", gameProducts)
+                            </div>
+                        </div>
+                        <!-- /tab -->
+                    </div>
+                </div>
+            </div>
+            <!-- /Products tab -->
+            <!-- /Products tab & slick -->
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- END SECTION TOP SELLING -->
+
+<style>
+    .section-title {
+        background-color: #343a40;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+        .section-title .title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+    .section-nav .section-tab-nav li a {
+        font-size: 16px;
+        color: #007bff;
+        text-decoration: none;
+        background-color: transparent;
+        transition: all 0.3s ease;
+    }
+
+        .section-nav .section-tab-nav li a:hover {
+            background-color: #007bff;
+            color: white;
+            transform: scale(1.05);
+        }
+
+</style>

@@ -1,0 +1,31 @@
+﻿<h2>Admin Dashboard</h2>
+
+<div>
+    <h3>Generate Dataset</h3>
+    <button id="generateDatasetButton">Generate Dataset</button>
+    <p id="message"></p>
+</div>
+
+<script>
+    document.getElementById("generateDatasetButton").addEventListener("click", function () {
+        fetch('/Admin/Dataset/Generate', { // Đảm bảo URL chính xác
+            method: 'POST', // Sử dụng POST
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text(); // Trả về nội dung thông báo thành công
+                }
+                throw new Error('Failed to generate dataset');
+            })
+            .then(message => {
+                document.getElementById("message").innerText = "Tạo thành công";
+            })
+            .catch(error => {
+                document.getElementById("message").innerText = error.message; // Hiển thị lỗi
+            });
+    });
+</script>
+

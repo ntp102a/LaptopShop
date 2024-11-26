@@ -54,7 +54,7 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
 		<PackageReference Include="Microsoft.ML" Version="3.0.1" />
 		<PackageReference Include="Microsoft.ML.Recommender" Version="0.21.1" />
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.18" />
 		<PackageReference Include="PagedList.Core.Mvc" Version="3.0.0" />
 		<PackageReference Include="PayPal" Version="2.0.0-rc2" />
 		<PackageReference Include="PayPalCheckoutSdk.DotNet6" Version="1.0.2" />
@@ -85,20 +85,20 @@
 		<None Include="Views\Shared\Error.cshtml" />
 		<None Include="Views\Shared\_Layout.cshtml" />
 		<None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
-		<None Include="wwwroot\css\bootstrap.min.css"/>
-		<None Include="wwwroot\css\site.css"/>
-		<None Include="wwwroot\css\slick.css"/>
-		<None Include="wwwroot\css\slick-theme.css"/>
-		<None Include="wwwroot\css\style.css"/>
-		<None Include="wwwroot\css\font-awesome.min.css"/>
-		<None Include="wwwroot\css\nouislider.min.css"/>
-		<None Include="wwwroot\js\bootstrap.min.js"/>
-		<None Include="wwwroot\js\jquery.min.js"/>
-		<None Include="wwwroot\js\jquery.zoom.min.js"/>
-		<None Include="wwwroot\js\main.js"/>
-		<None Include="wwwroot\js\nouislider.min.js"/>
-		<None Include="wwwroot\js\site.js"/>
-		<None Include="wwwroot\js\slick.min.js"/>
+		<None Include="wwwroot\css\bootstrap.min.css" />
+		<None Include="wwwroot\css\site.css" />
+		<None Include="wwwroot\css\slick.css" />
+		<None Include="wwwroot\css\slick-theme.css" />
+		<None Include="wwwroot\css\style.css" />
+		<None Include="wwwroot\css\font-awesome.min.css" />
+		<None Include="wwwroot\css\nouislider.min.css" />
+		<None Include="wwwroot\js\bootstrap.min.js" />
+		<None Include="wwwroot\js\jquery.min.js" />
+		<None Include="wwwroot\js\jquery.zoom.min.js" />
+		<None Include="wwwroot\js\main.js" />
+		<None Include="wwwroot\js\nouislider.min.js" />
+		<None Include="wwwroot\js\site.js" />
+		<None Include="wwwroot\js\slick.min.js" />
 		<None Include="wwwroot\assets\fonts\fontawesome-webfont.svg" />
 		<None Include="wwwroot\assets\fonts\fontawesome-webfont.woff2" />
 		<None Include="wwwroot\assets\fonts\Pe-icon-7-stroke.svg" />

@@ -15,45 +15,24 @@ namespace LaptopShop.Controllers
         }
 
         [Route("/tat-ca-san-pham", Name = "ShopProduct")]
-        public IActionResult Index(int? page, int? pagesize, int? sort)
+        public IActionResult Index()
         {
             try
             {
-                var pageNumber = page == null || page <= 0 ? 1 : page.Value;
-                var pageSize = pagesize ?? 12;
+                var lsProducts = _context.Products
+                .AsNoTracking()
+                .Include(p => p.Image)
+                .Include(p => p.Info)
+                .OrderByDescending(x => x.Info.Date)
+                .ToList();
 
-                IQueryable<Product> lsProduct;
-                if (sort == 0)
-                {
-                    lsProduct = _context.Products
-                    .AsNoTracking()
-                    .Include(p => p.Image)
-                    .Include(p => p.Info)
-                    .OrderByDescending(x => x.ProductId);
-                }
-                else if (sort == 1)
-                {
-                    lsProduct = _context.Products
-                    .AsNoTracking()
-                    .Include(p => p.Image)
-                    .Include(p => p.Info)
-                    .OrderBy(x => x.Price);
-                }
-                else
-                {
-                    lsProduct = _context.Products
-                    .AsNoTracking()
-                    .Include(p => p.Image)
-                    .Include(p => p.Info)
-                    .OrderByDescending(x => x.Price);
-                }
+                ViewBag.lsProduct = lsProducts;
+
                 var lsCategory = _context.Categories
                     .AsNoTracking()
                     .ToList();
-                PagedList<Product> models = new PagedList<Product>(lsProduct, pageNumber, pageSize);
-                ViewBag.CurrentPages = pageNumber;
                 ViewBag.Categories = lsCategory;
-                return View(models);
+                return View();
             }
             catch
             {
@@ -61,65 +40,122 @@ namespace LaptopShop.Controllers
             }
         }
 
-        [Route("/danh-muc/{name}")]
-        public IActionResult List(string name, int page = 1, int pagesize = 0, int sort = 0)
-        {
-            try
-            {
-                var pageSize = 12;
-                if (pagesize != 0)
-                {
-                    pageSize = pagesize;
-                }
-                var danhmuc = _context.Categories
-                    .AsNoTracking()
-                    .SingleOrDefault(x => x.CategoryName == name);
-                IQueryable<Product> lsPages;
-                if (sort == 0)
-                {
-                    lsPages = _context.Products
-                    .Include(p => p.Image)
-                    .Include(p => p.Category)
-                    .Include(p => p.Info)
-                    .Where(p => p.Category.CategoryName == name)
-                    .AsNoTracking()
-                    .OrderByDescending(x => x.Info.Date);
-                }
-                else if (sort == 1)
-                {
-                    lsPages = _context.Products
-                    .Include(p => p.Image)
-                    .Include(p => p.Category)
-                    .Include(p => p.Info)
-                    .Where(p => p.ProductName == name)
-                    .AsNoTracking()
-                    .OrderBy(x => x.Price);
-                }
-                else
-                {
-                    lsPages = _context.Products
-                    .Include(p => p.Image)
-                    .Include(p => p.Category)
-                    .Include(p => p.Info)
-                    .Where(p => p.Category.CategoryName == name)
-                    .AsNoTracking()
-                    .OrderByDescending(x => x.Price);
-                }
-                var lsCategory = _context.Categories
-                    .AsNoTracking()
-                    .ToList();
+        //public IActionResult Index(int? page, int? pagesize, int? sort)
+        //{
+        //    try
+        //    {
+        //        //var pageNumber = page == null || page <= 0 ? 1 : page.Value;
+        //        //var pageSize = pagesize ?? 12;
 
-                PagedList<Product> models = new PagedList<Product>(lsPages, page, pageSize);
-                ViewBag.CurrentPage = page;
-                ViewBag.CurrentCat = danhmuc;
-                ViewBag.Categories = lsCategory;
-                return View(models);
-            }
-            catch
-            {
-                return RedirectToAction("Index", "Home");
-            }
-        }
+        //        var lsProducts = _context.Products
+        //        .AsNoTracking()
+        //        .Include(p => p.Image)
+        //        .Include(p => p.Info)
+        //        .OrderByDescending(x => x.Info.Date)
+        //        .ToList();
+
+
+        //        ViewBag.lsProduct = lsProducts;
+
+        //        //IQueryable<Product> lsProduct;
+                
+        //        //if (sort == 0)
+        //        //{
+        //        //    lsProduct = _context.Products
+        //        //    .AsNoTracking()
+        //        //    .Include(p => p.Image)
+        //        //    .Include(p => p.Info)
+        //        //    .OrderByDescending(x => x.ProductId);
+        //        //}
+        //        //else if (sort == 1)
+        //        //{
+        //        //    lsProduct = _context.Products
+        //        //    .AsNoTracking()
+        //        //    .Include(p => p.Image)
+        //        //    .Include(p => p.Info)
+        //        //    .OrderBy(x => x.Price);
+        //        //}
+        //        //else
+        //        //{
+        //        //    lsProduct = _context.Products
+        //        //    .AsNoTracking()
+        //        //    .Include(p => p.Image)
+        //        //    .Include(p => p.Info)
+        //        //    .OrderByDescending(x => x.Price);
+        //        //}
+        //        var lsCategory = _context.Categories
+        //            .AsNoTracking()
+        //            .ToList();
+        //        //PagedList<Product> models = new PagedList<Product>(lsProducts, pageNumber, pageSize);
+        //        //ViewBag.CurrentPages = pageNumber;
+        //        ViewBag.Categories = lsCategory;
+        //        return View();
+        //    }
+        //    catch
+        //    {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //}
+
+        //[Route("/danh-muc/{name}")]
+        //public IActionResult List(string name, int page = 1, int pagesize = 0, int sort = 0)
+        //{
+        //    try
+        //    {
+        //        var pageSize = 12;
+        //        if (pagesize != 0)
+        //        {
+        //            pageSize = pagesize;
+        //        }
+        //        var danhmuc = _context.Categories
+        //            .AsNoTracking()
+        //            .SingleOrDefault(x => x.CategoryName == name);
+        //        IQueryable<Product> lsPages;
+        //        if (sort == 0)
+        //        {
+        //            lsPages = _context.Products
+        //            .Include(p => p.Image)
+        //            .Include(p => p.Category)
+        //            .Include(p => p.Info)
+        //            .Where(p => p.Category.CategoryName == name)
+        //            .AsNoTracking()
+        //            .OrderByDescending(x => x.Info.Date);
+        //        }
+        //        else if (sort == 1)
+        //        {
+        //            lsPages = _context.Products
+        //            .Include(p => p.Image)
+        //            .Include(p => p.Category)
+        //            .Include(p => p.Info)
+        //            .Where(p => p.ProductName == name)
+        //            .AsNoTracking()
+        //            .OrderBy(x => x.Price);
+        //        }
+        //        else
+        //        {
+        //            lsPages = _context.Products
+        //            .Include(p => p.Image)
+        //            .Include(p => p.Category)
+        //            .Include(p => p.Info)
+        //            .Where(p => p.Category.CategoryName == name)
+        //            .AsNoTracking()
+        //            .OrderByDescending(x => x.Price);
+        //        }
+        //        var lsCategory = _context.Categories
+        //            .AsNoTracking()
+        //            .ToList();
+
+        //        PagedList<Product> models = new PagedList<Product>(lsPages, page, pageSize);
+        //        ViewBag.CurrentPage = page;
+        //        ViewBag.CurrentCat = danhmuc;
+        //        ViewBag.Categories = lsCategory;
+        //        return View(models);
+        //    }
+        //    catch
+        //    {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //}
 
         [Route("/san-pham/{name}", Name ="Products")]
         public IActionResult Details(string name)
@@ -153,6 +189,38 @@ namespace LaptopShop.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+        }
+
+        public IActionResult GetProductData(List<int> categoryIds, int? sort)
+        {
+            var query = _context.Products.AsQueryable();
+
+            if (categoryIds != null && categoryIds.Any())
+            {
+                query = query.Where(p => categoryIds.Contains(p.CategoryId));
+            }
+
+            query = query
+                .AsNoTracking()
+                .Include(p => p.Image)
+                .Include(p => p.Info);
+
+            switch (sort)
+            {
+                case 1:
+                    query = query.OrderBy(x => x.Price);
+                    break;
+                case 2:
+                    query = query.OrderByDescending(x => x.Price);
+                    break;
+                default:
+                    query = query.OrderByDescending(x => x.Info.Date);
+                    break;
+            }
+
+            var lsProducts = query.ToList();
+
+            return PartialView("_ProductsPartialView", lsProducts);
         }
 
     }
