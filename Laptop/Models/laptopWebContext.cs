@@ -25,6 +25,7 @@ namespace LaptopShop.Models
         public virtual DbSet<Product> Products { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
         public virtual DbSet<TransactStatus> TransactStatuses { get; set; } = null!;
+        public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -209,6 +210,29 @@ namespace LaptopShop.Models
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.ProductId)
                     .HasConstraintName("FK_Order_details_Products");
+            });
+
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.ToTable("Reviews");
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductId");
+
+                entity.Property(e => e.UserId).HasColumnName("UserId");
+
+                entity.Property(e => e.Rating).HasColumnName("Rating");
+
+                entity.Property(e => e.Comment).HasColumnName("Comment");
+
+                entity.Property(e => e.CreatedAt).HasColumnName("CreatedAt");
+
+                entity.HasOne(r => r.Products)
+                    .WithMany(p => p.Reviews)
+                    .HasForeignKey(r => r.ProductId);
+
+                entity.HasOne(r => r.Users)
+                    .WithMany(u => u.Reviews)
+                    .HasForeignKey(r => r.UserId);
             });
 
             modelBuilder.Entity<Product>(entity =>

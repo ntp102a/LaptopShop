@@ -1,4 +1,6 @@
-﻿using LaptopShop.Models;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using LaptopShop.Models;
+using LaptopShop.ModelViews;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PagedList.Core;
@@ -9,9 +11,11 @@ namespace LaptopShop.Controllers
     public class ProductController : Controller
     {
         private readonly laptopWebContext _context;
-        public ProductController(laptopWebContext context)
+        public INotyfService _notyfService { get; }
+        public ProductController(laptopWebContext context, INotyfService notyfService)
         {
             _context = context;
+            _notyfService = notyfService;
         }
 
         [Route("/tat-ca-san-pham", Name = "ShopProduct")]
@@ -166,11 +170,41 @@ namespace LaptopShop.Controllers
                     .Include(p => p.Image)
                     .Include(p => p.Info)
                     .Include(p => p.Category)
+                    .Include(p => p.Reviews)
                     .FirstOrDefault(x => x.ProductName == name);
+
                 if (product == null)
                 {
                     return RedirectToAction("Index");
                 }
+
+                var reviews = _context.Reviews
+                    .Include(p => p.Users)
+                    .Include(p => p.Products)
+                    .Where(x => x.ProductId == product.ProductId)
+                    .OrderByDescending(x => x.CreatedAt)
+                    .ToList();
+
+                // Tính toán đánh giá trung bình
+                var averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+
+                // Phân loại Rating Breakdown (Số lượng reviews với từng rating từ 1 đến 5 sao)
+                var ratingBreakdown = new List<RatingBreakdownViewModel>();
+                for (int i = 1; i <= 5; i++)
+                {
+                    var count = reviews.Count(r => r.Rating == i);
+                    var percentage = reviews.Any() ? (count / (double)reviews.Count) * 100 : 0;
+                    ratingBreakdown.Add(new RatingBreakdownViewModel
+                    {
+                        Star = i,
+                        Count = count,
+                        Percentage = percentage
+                    });
+                }
+
+                ViewBag.Reviews = reviews;
+                ViewBag.AverageRating = averageRating;
+                ViewBag.RatingBreakdown = ratingBreakdown;
 
                 var lsProduct = _context.Products
                     .AsNoTracking()
@@ -191,6 +225,30 @@ namespace LaptopShop.Controllers
 
         }
 
+        [HttpPost]
+        public IActionResult CreateComment(Review model)
+        {
+            var taikhoanID = HttpContext.Session.GetString("UserId");
+            if (taikhoanID != null)
+            {
+                var review = new Review
+                {
+                    ProductId = model.ProductId,
+                    UserId = taikhoanID,
+                    Rating = model.Rating,
+                    Comment = model.Comment,
+                    CreatedAt = DateTime.Now,
+                };
+                _context.Add(review);
+                _context.SaveChanges();
+
+                _notyfService.Success("Thành công");
+            }
+
+
+
+            return RedirectToAction("Details", new { name = model.Products.ProductName });
+        }
         public IActionResult GetProductData(List<int> categoryIds, int? sort)
         {
             var query = _context.Products.AsQueryable();
