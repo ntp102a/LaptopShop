@@ -184,7 +184,7 @@ namespace LaptopShop.Controllers
                     .Where(x => x.ProductId == product.ProductId)
                     .OrderByDescending(x => x.CreatedAt)
                     .ToList();
-
+                int totalComment = reviews.Count;
                 // Tính toán đánh giá trung bình
                 var averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
 
@@ -201,8 +201,8 @@ namespace LaptopShop.Controllers
                         Percentage = percentage
                     });
                 }
-
                 ViewBag.Reviews = reviews;
+                ViewBag.TotalComment = totalComment;
                 ViewBag.AverageRating = averageRating;
                 ViewBag.RatingBreakdown = ratingBreakdown;
 
@@ -229,6 +229,11 @@ namespace LaptopShop.Controllers
         public IActionResult CreateComment(Review model)
         {
             var taikhoanID = HttpContext.Session.GetString("UserId");
+            var products = _context.Products
+                .Include(p => p.Image)
+                .Include(p => p.Info)
+                .Include(p => p.Category)
+                .FirstOrDefault(n => n.ProductId == model.ProductId);
             if (taikhoanID != null)
             {
                 var review = new Review
@@ -244,10 +249,19 @@ namespace LaptopShop.Controllers
 
                 _notyfService.Success("Thành công");
             }
+            else
+            {
+                HttpContext.Session.SetString("returnUrlBack", Url.Action("Details", new { name = products.ProductName }));
+                _notyfService.Error("Vui lòng đăng nhập để sử dụng tính năng này!");
+                return RedirectToAction("Login", "Accounts");
+            }
+            var reviews = _context.Reviews
+                .Include(p => p.Products)
+                .Where(p => p.UserId == taikhoanID)
+                .OrderByDescending(p => p.CreatedAt)
+                .FirstOrDefault();
 
-
-
-            return RedirectToAction("Details", new { name = model.Products.ProductName });
+            return RedirectToAction("Details", new { name = reviews.Products.ProductName });
         }
         public IActionResult GetProductData(List<int> categoryIds, int? sort)
         {
