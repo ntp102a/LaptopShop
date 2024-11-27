@@ -9,6 +9,7 @@ namespace LaptopShop.Models
         {
             Carts = new HashSet<Cart>();
             OrderDetails = new HashSet<OrderDetail>();
+            Reviews = new HashSet<Review>();
         }
 
         public int ProductId { get; set; }
@@ -26,5 +27,6 @@ namespace LaptopShop.Models
         public virtual Information? Info { get; set; }
         public virtual ICollection<Cart> Carts { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<Review> Reviews { get; set; }
     }
 }
