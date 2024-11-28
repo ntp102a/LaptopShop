@@ -225,14 +225,13 @@ namespace LaptopShop.Controllers
                 }
                 else
                 {
-                    var returnUrlBack = HttpContext.Session.GetString("returnUrlBack");
-                    if (!string.IsNullOrEmpty(returnUrlBack))
+                    returnUrl = HttpContext.Session.GetString("returnUrl");
+                    if (!string.IsNullOrEmpty(returnUrl))
                     {
                         // Xóa ReturnUrl khỏi session sau khi sử dụng
-                        HttpContext.Session.Remove("returnUrlBack");
-                        return Redirect(returnUrlBack);
+                        HttpContext.Session.Remove("returnUrl");
+                        return Redirect(returnUrl);
                     }
-                    returnUrl = returnUrlBack;
                     if (Url.IsLocalUrl(returnUrl))
                         return Redirect(returnUrl);
                     else

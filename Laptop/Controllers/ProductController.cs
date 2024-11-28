@@ -251,7 +251,7 @@ namespace LaptopShop.Controllers
             }
             else
             {
-                HttpContext.Session.SetString("returnUrlBack", Url.Action("Details", new { name = products.ProductName }));
+                HttpContext.Session.SetString("returnUrl", Url.Action("Details", new { name = products.ProductName }));
                 _notyfService.Error("Vui lòng đăng nhập để sử dụng tính năng này!");
                 return RedirectToAction("Login", "Accounts");
             }
