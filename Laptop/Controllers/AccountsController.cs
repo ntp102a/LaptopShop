@@ -205,6 +205,7 @@ namespace LaptopShop.Controllers
                 }
 
                 HttpContext.Session.SetString("UserId", khachhang.UserId.ToString());
+
                 var taikhoanID = HttpContext.Session.GetString("UserId");
 
                 var claims = new List<Claim>()
@@ -224,6 +225,14 @@ namespace LaptopShop.Controllers
                 }
                 else
                 {
+                    var returnUrlBack = HttpContext.Session.GetString("returnUrlBack");
+                    if (!string.IsNullOrEmpty(returnUrlBack))
+                    {
+                        // Xóa ReturnUrl khỏi session sau khi sử dụng
+                        HttpContext.Session.Remove("returnUrlBack");
+                        return Redirect(returnUrlBack);
+                    }
+                    returnUrl = returnUrlBack;
                     if (Url.IsLocalUrl(returnUrl))
                         return Redirect(returnUrl);
                     else
