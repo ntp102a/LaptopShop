@@ -498,27 +498,26 @@
     //    });
     //});
 
-    //$(document).ready(function () {
-    //    // Sử dụng sự kiện khi nút tìm kiếm được nhấn
-    //    $(".search-btn").click(function (event) {
-    //        event.preventDefault(); // Ngăn chặn việc gửi form mặc định
+    $(document).ready(function () {
+        $(".search-btn").click(function (event) {
+            event.preventDefault();
 
-    //        var strkeyword = $('#keyword').val();
+            var strkeyword = $('#keyword').val();
 
-    //        // Thực hiện AJAX request
-    //        $.ajax({
-    //            url: '/SearchProduct/SearchingProduct',
-    //            type: 'GET', // Sử dụng phương thức GET
-    //            data: { keyword: strkeyword }, // Gửi từ khóa tìm kiếm
-    //            success: function (results) {
-    //                window.location.href = '/SearchProduct/SearchingProduct?keyword=' + strkeyword;
-    //            },
-    //            error: function (xhr, status, error) {
-    //                console.log(error); // Log lỗi nếu có
-    //            }
-    //        });
-    //    });
-    //});
+            // Thực hiện AJAX request
+            $.ajax({
+                url: '/SearchProduct/SearchingProduct',
+                type: 'GET', // Sử dụng phương thức GET
+                data: { keyword: strkeyword }, // Gửi từ khóa tìm kiếm
+                success: function (results) {
+                    window.location.href = '/SearchProduct/SearchingProduct?keyword=' + strkeyword;
+                },
+                error: function (xhr, status, error) {
+                    console.log(error); // Log lỗi nếu có
+                }
+            });
+        });
+    });
 
     //$(document).ready(function () {
     //    function clearLocalStorage() {
@@ -563,6 +562,7 @@
             $("#headerCart").load("/AjaxContent/HeaderCart");
         }
     });
+
 </script>
 
 <!-- CHATBOT -->
