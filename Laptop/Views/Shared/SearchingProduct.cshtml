@@ -1,37 +1,41 @@
-﻿
-@model List<Product>
+﻿@using PagedList.Core.Mvc
+@model PagedList.Core.IPagedList<LaptopShop.Models.Product>
+
 @{
-    ViewData["Title"] = ViewBag.CurrentPage;
+    ViewData["Title"] = "LaptopShop";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    List<Product> searchProducts = ViewBag.ListProduct;
+
 }
+
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="breadcrumb-tree">
+                    <li><a href="/">Trang chủ</a></li>
+                    <li>Tất cả sản phẩm</li>
+                </ul>
+            </div>
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /BREADCRUMB -->
 <!-- SECTION -->
 <div class="section">
     <!-- container -->
     <div class="container">
         <!-- row -->
         <div class="row">
-            <!-- ASIDE -->
+            <!-- Filter -->
             <div id="aside" class="col-md-3">
-                <!-- aside Widget -->
-                @*<div class="aside">
-                    <h3 class="aside-title">Giá</h3>
-                    <div class="price-filter">
-                        <div id="price-slider"></div>
-                        <div class="input-number price-min">
-                            <input id="price-min" type="number">
-                            <span class="qty-up">+</span>
-                            <span class="qty-down">-</span>
-                        </div>
-                        <span>-</span>
-                        <div class="input-number price-max">
-                            <input id="price-max" type="number">
-                            <span class="qty-up">+</span>
-                            <span class="qty-down">-</span>
-                        </div>
-                    </div>
-                </div>*@
-
-                @*<div class="aside">
+                <div class="aside">
                     <h3 class="aside-title">Hãng</h3>
                     <div class="checkbox-filter">
                         @foreach (var item in ViewBag.Categories)
@@ -45,90 +49,32 @@
                             </div>
                         }
                     </div>
-                </div>*@
-
-                <!-- /aside Widget -->
+                </div>
             </div>
-            <!-- /ASIDE -->
+            <!-- END Filter -->
             <!-- STORE -->
             <div id="store" class="col-md-9">
-                <!-- store top filter -->
+                <!-- Sort -->
                 <div class="store-filter clearfix">
                     <div class="store-sort">
-                        @*<label>
+                        <label>
                             Sort:
                             <select id="sortSelect" class="sort-select">
                                 <option value="0">Tất cả</option>
                                 <option value="1">Tăng dần theo giá</option>
                                 <option value="2">Giảm dần theo giá</option>
+                                <option value="3">Từ A - Z</option>
+                                <option value="4">Từ Z - A</option>
                             </select>
-                        </label>*@
-
-                        @*<label>
-                            Show:
-                            <select id="pageSizeSelect" class="show-select">
-                                <option value="12" selected>12</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                            </select>
-                        </label>*@
+                        </label>
                     </div>
-                    
                 </div>
-                <!-- /store top filter -->
-                <!-- store products -->
-                <div class="row" id="records_table">
-                    @if (Model != null)
-                    {
-                        @foreach (var item in Model)
-                        {
-                            string url = $"/san-pham/{item.ProductName}";
-                            decimal oldPrice = item.Price ?? 0; // Giá cũ (nếu null, mặc định là 0)
-                            decimal discount = item.Discount.HasValue ? item.Discount.Value : 0;
-
-                            string formattedOldPrice = oldPrice.ToString("#,##0") + " VND";
-
-                            decimal newPrice = oldPrice - (oldPrice * discount / 100); // Giá mới
-                            string formattedNewPrice = newPrice.ToString("#,##0") + " VND";
-
-                            <!-- product 1 -->
-                            <div class="col-md-4 col-xs-6">
-                                <div class="product">
-                                    <div class="product-img">
-                                        <a href="@url">
-                                            <img width="250" height="250" src="/images/products/@item.Image.ImageThumb" alt="">
-                                        </a>
-                                        <div class="product-label">
-                                            @if (discount > 0)
-                                            {
-                                                <span class="sale">-@discount%</span>
-                                            }
-                                        </div>
-                                    </div>
-                                    <div class="product-body">
-                                        <h3 class="product-name"><a href="@url">@item.ProductName</a></h3>
-                                        <h4 class="product-price">
-                                            @if (discount <= 0)
-                                            {
-                                                <del>@formattedOldPrice</del>
-                                            }
-                                            @formattedNewPrice
-                                        </h4>
-                                    </div>
-                                    <div class="add-to-cart">
-                                        <button class="add-to-cart-btn">
-                                            <i class="fa fa-shopping-cart"></i>
-                                            Thêm vào giỏ hàng
-                                            <input hidden asp-for="@item.ProductId" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- /product -->
-                            <div class="clearfix visible-sm visible-xs"></div>
-                        }
-                    }
+                <!-- End Sort -->
+                <!-- List Products -->
+                <div id="productList" class="row">
+                    @await Html.PartialAsync("_SearchProductPartialView", searchProducts)
                 </div>
+
             </div>
             <!-- /STORE -->
         </div>
@@ -138,6 +84,68 @@
 </div>
 <!-- /SECTION -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.category-checkbox').change(function () {
+                const searchProductIds = @Html.Raw(Json.Serialize(searchProducts.Select(p => p.ProductId)));
+                const selectedCategories = [];
+                $('.category-checkbox:checked').each(function () {
+                    selectedCategories.push($(this).data('category-id'));
+                });
+
+                const selectedSort = $('#sortSelect').val();
+
+                $.ajax({
+                    url: '/SearchProduct/GetProductData',
+                    type: 'GET',
+                    data: {
+                        categoryIds: selectedCategories,
+                        sort: selectedSort,
+                        productIds: searchProductIds
+                    },
+                    traditional: true,
+                    success: function (data) {
+                        $('#productList').html(data);
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra khi tải dữ liệu.');
+                    }
+                });
+            });
+
+            $("#sortSelect").change(function () {
+                const searchProductIds = @Html.Raw(Json.Serialize(searchProducts.Select(p => p.ProductId)));
+                var selectedSort = $(this).val();
+
+                const selectedCategories = [];
+                $('.category-checkbox:checked').each(function () {
+                    selectedCategories.push($(this).data('category-id'));
+                });
+
+                $.ajax({
+                    url: '/SearchProduct/GetProductData',
+                    type: 'GET',
+                    data: {
+                        categoryIds: selectedCategories,
+                        sort: selectedSort,
+                        productIds: searchProductIds
+                    },
+                    traditional: true,
+                    success: function (data) {
+                        $('#productList').html(data);
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra khi tải dữ liệu.');
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
 <style>
     .sort-select {
         padding: 0px 15px;
