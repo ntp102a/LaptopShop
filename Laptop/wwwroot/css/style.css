@@ -505,7 +505,7 @@ textarea.input {
 }
 
     .header-search form {
-        position: relative;
+        position: absolute;
         width: 500px;
     }
 

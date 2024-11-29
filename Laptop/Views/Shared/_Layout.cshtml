@@ -443,91 +443,18 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    //$(document).ready(function () {
-    //    var selectElement = $('.input-select');
-
-    //    var defaultOption = $('<option>', {
-    //        value: '0',
-    //        text: 'Chọn để lọc'
-    //    });
-
-    //    var selectAllOption = $('<option>', {
-    //        value: 'all',
-    //        text: 'Tất cả'
-    //    });
-
-    //    selectElement.append(defaultOption);
-    //    selectElement.append(selectAllOption);
-
-    //    $.ajax({
-    //        url: '/Home/GetCategories',
-    //        type: 'GET',
-    //        dataType: 'json',
-    //        success: function (data) {
-    //            data.forEach(function (categoryItem) {
-    //                var category = categoryItem.category;
-    //                var option = $('<option>', {
-    //                    value: category.CategoryName,
-    //                    text: category.CategoryName
-    //                });
-    //                selectElement.append(option);
-    //            });
-    //        },
-    //        error: function () {
-    //            console.error('Không thể lấy danh sách danh mục từ máy chủ.');
-    //        }
-    //    });
-    //});
-
-    //$(document).ready(function () {
-    //    var selectElement = $('#categorySelect'); // Sử dụng ID của thẻ select
-
-    //    // Lắng nghe sự kiện thay đổi của thẻ select
-    //    selectElement.on('change', function () {
-    //        var selectedCategoryName = $(this).find('option:selected').text(); // Lấy tên danh mục được chọn
-
-    //        if (selectedCategoryName !== 'Chọn để lọc' && selectedCategoryName !== 'Tất cả') {
-    //            // Chuyển hướng đến trang sản phẩm cụ thể dựa trên CategoryName
-    //            var url = '/danh-muc/' + selectedCategoryName;
-    //            window.location.href = url;
-    //        }
-    //        if (selectedCategoryName === 'Tất cả') {
-    //            var url = "/tat-ca-san-pham";
-    //            window.location.href = url;
-    //        }
-    //    });
-    //});
-
     $(document).ready(function () {
         $(".search-btn").click(function (event) {
             event.preventDefault();
 
             var strkeyword = $('#keyword').val();
 
-            // Thực hiện AJAX request
-            $.ajax({
-                url: '/SearchProduct/SearchingProduct',
-                type: 'GET', // Sử dụng phương thức GET
-                data: { keyword: strkeyword }, // Gửi từ khóa tìm kiếm
-                success: function (results) {
-                    window.location.href = '/SearchProduct/SearchingProduct?keyword=' + strkeyword;
-                },
-                error: function (xhr, status, error) {
-                    console.log(error); // Log lỗi nếu có
-                }
-            });
+            // Chuyển hướng trực tiếp với query string
+            if (strkeyword.trim() !== "") {
+                window.location.href = '/search?q=' + encodeURIComponent(strkeyword);
+            }
         });
     });
-
-    //$(document).ready(function () {
-    //    function clearLocalStorage() {
-    //        if (window.location.href.indexOf('/tat-ca-san-pham') === -1) {
-    //            localStorage.removeItem('selectedPageSize');
-    //            localStorage.removeItem('selectedSort');
-    //        }
-    //    }
-    //    window.onbeforeunload = clearLocalStorage;
-    //});
 
     //add to cart
     $(document).ready(function () {

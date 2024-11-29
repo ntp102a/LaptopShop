@@ -265,34 +265,49 @@ namespace LaptopShop.Controllers
         }
         public IActionResult GetProductData(List<int> categoryIds, int? sort)
         {
-            var query = _context.Products.AsQueryable();
-
-            if (categoryIds != null && categoryIds.Any())
-            {
-                query = query.Where(p => categoryIds.Contains(p.CategoryId));
-            }
-
-            query = query
+            // Truy vấn sản phẩm từ cơ sở dữ liệu dựa trên productIds
+            var products = _context.Products
                 .AsNoTracking()
                 .Include(p => p.Image)
-                .Include(p => p.Info);
+                .Include(p => p.Info)
+                .Select(p => new
+                {
+                    Product = p,
+                    FinalPrice = (decimal)p.Price * (100 - (decimal)p.Discount) / 100
+                });
 
+            // Lọc theo categoryIds
+            if (categoryIds != null && categoryIds.Any())
+            {
+                products = products.Where(p => categoryIds.Contains(p.Product.CategoryId));
+            }
+
+
+
+            // Sắp xếp nếu có
             switch (sort)
             {
                 case 1:
-                    query = query.OrderBy(x => x.Price);
+                    products = products.OrderBy(p => p.FinalPrice);
                     break;
                 case 2:
-                    query = query.OrderByDescending(x => x.Price);
+                    products = products.OrderByDescending(p => p.FinalPrice);
+                    break;
+                case 3:
+                    products = products.OrderBy(p => p.Product.ProductName);
+                    break;
+                case 4:
+                    products = products.OrderByDescending(p => p.Product.ProductName);
                     break;
                 default:
-                    query = query.OrderByDescending(x => x.Info.Date);
+                    products = products.OrderByDescending(p => p.Product.Info.Date);
                     break;
             }
 
-            var lsProducts = query.ToList();
+            var result = products.Select(p => p.Product).ToList();
 
-            return PartialView("_ProductsPartialView", lsProducts);
+            // Trả về partial view
+            return PartialView("_ProductsPartialView", result);
         }
 
     }
