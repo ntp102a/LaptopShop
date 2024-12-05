@@ -2,13 +2,10 @@
 @model PagedList.Core.IPagedList<LaptopShop.Models.Product>
 
 @{
-    ViewData["Title"] = "Shop - " /*+ ViewBag.CurrentPages*/;
+    ViewData["Title"] = "Shop Laptop";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     List<Product> allProducts = ViewBag.lsProduct;
-
-    //int PageCurrent = ViewBag.CurrentPages;
-    //int NextPage = PageCurrent + 1;
 }
 
 <!-- BREADCRUMB -->
@@ -37,25 +34,7 @@
         <div class="row">
             <!-- Filter -->
             <div id="aside" class="col-md-3">
-                <!-- Filter theo giá -->
-                @*<div class="aside">
-                    <h3 class="aside-title">Price</h3>
-                    <div class="price-filter">
-                        <div id="price-slider"></div>
-                        <div class="input-number price-min">
-                            <input id="price-min" type="number">
-                            <span class="qty-up">+</span>
-                            <span class="qty-down">-</span>
-                        </div>
-                        <span>-</span>
-                        <div class="input-number price-max">
-                            <input id="price-max" type="number">
-                            <span class="qty-up">+</span>
-                            <span class="qty-down">-</span>
-                        </div>
-                    </div>
-                </div>*@
-
+                
                 <div class="aside">
                     <h3 class="aside-title">Hãng</h3>
                     <div class="checkbox-filter">
@@ -72,7 +51,28 @@
                     </div>
                 </div>
 
-                <!-- /aside Widget -->
+                <div class="aside">
+                    <h3 class="aside-title">Nhu cầu sử dụng</h3>
+                    <div class="checkbox-filter">
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="vanphong" class="need-checkbox" data-need-id="1" value="Văn phòng">
+                            <label for="vanphong"><span></span>Văn phòng</label>
+                        </div>
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="dohoa" class="need-checkbox" data-need-id="2" value="Đồ họa">
+                            <label for="dohoa"><span></span>Đồ họa</label>
+                        </div>
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="laptrinh" class="need-checkbox" data-need-id="3" value="Lập trình">
+                            <label for="laptrinh"><span></span>Lập trình</label>
+                        </div>
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="gaming" class="need-checkbox" data-need-id="4" value="Gaming">
+                            <label for="gaming"><span></span>Gaming</label>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <!-- END Filter -->
             <!-- STORE -->
@@ -142,54 +142,60 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('.category-checkbox').change(function () {
+            // Hàm gửi dữ liệu lọc
+            function applyFilters() {
+                // Lấy danh sách các hãng được chọn
                 const selectedCategories = [];
                 $('.category-checkbox:checked').each(function () {
-                    selectedCategories.push($(this).data('category-id'));
+                    const categoryId = $(this).data('category-id');
+                    if (categoryId) {
+                        selectedCategories.push(categoryId); // Hãng
+                    }
                 });
 
+                // Lấy danh sách nhu cầu sử dụng được chọn
+                const selectedNeeds = [];
+                $('.need-checkbox:checked').each(function () {
+                    const needValue = $(this).val();
+                    if (!$(this).data('category-id') && needValue) {
+                        selectedNeeds.push(needValue); // Nhu cầu sử dụng
+                    }
+                });
+
+                // Lấy thứ tự sắp xếp
                 const selectedSort = $('#sortSelect').val();
 
+                // Gửi dữ liệu qua AJAX
                 $.ajax({
                     url: '/Product/GetProductData',
                     type: 'GET',
                     data: {
-                        categoryIds: selectedCategories,
-                        sort: selectedSort 
+                        categoryIds: selectedCategories, // Hãng
+                        needs: selectedNeeds, // Nhu cầu sử dụng
+                        sort: selectedSort // Sắp xếp
                     },
                     traditional: true,
                     success: function (data) {
-                        $('#productList').html(data);
+                        $('#productList').html(data); // Hiển thị sản phẩm
                     },
                     error: function () {
                         alert('Có lỗi xảy ra khi tải dữ liệu.');
                     }
                 });
+            }
+
+            // Lắng nghe sự kiện thay đổi checkbox
+            $('.category-checkbox').change(function () {
+                applyFilters();
+            });
+            // Lắng nghe sự kiện thay đổi checkbox
+            $('.need-checkbox').change(function () {
+                applyFilters();
             });
 
+            // Lắng nghe sự kiện thay đổi sắp xếp
             $("#sortSelect").change(function () {
-                var selectedSort = $(this).val();
-
-                const selectedCategories = [];
-                $('.category-checkbox:checked').each(function () {
-                    selectedCategories.push($(this).data('category-id'));
-                });
-
-                $.ajax({
-                    url: '/Product/GetProductData',
-                    type: 'GET',
-                    data: {
-                        categoryIds: selectedCategories,
-                        sort: selectedSort
-                    },
-                    traditional: true,
-                    success: function (data) {
-                        $('#productList').html(data);
-                    },
-                    error: function () {
-                        alert('Có lỗi xảy ra khi tải dữ liệu.');
-                    }
-                });
+                applyFilters();
             });
         });
     </script>
@@ -211,55 +217,3 @@
         height: 40px;
     }
 </style>
-
-@*@section Scripts {
-    <script>
-        $(document).ready(function () {
-            
-            $("#pageSizeSelect").change(function () {
-                var selectedPageSize = $(this).val();
-                var selectedSort = $("#sortSelect").val();
-                var url = '/tat-ca-san-pham?page=1&pagesize=' + selectedPageSize + '&sort=' + selectedSort;
-                localStorage.setItem('selectedPageSize', selectedPageSize);
-                window.location.href = url;
-            });
-
-            var initialPageSize = localStorage.getItem('selectedPageSize') || $("#pageSizeSelect").val();
-            $("#pageSizeSelect").val(initialPageSize);
-
-            $("#sortSelect").change(function () {
-                var selectedSort = $(this).val();
-                var selectedPageSize = $("#pageSizeSelect").val();
-                var url = '/tat-ca-san-pham?page=1&pagesize=' + selectedPageSize + '&sort=' + selectedSort;
-                localStorage.setItem('selectedSort', selectedSort);
-                window.location.href = url;
-            });
-
-            var initialSort = localStorage.getItem('selectedSort') || $("#sortSelect").val();
-            $("#sortSelect").val(initialSort);
-
-            var selectedCategoryIds = [];
-            $('.category-checkbox').change(function () {
-                console.log('Updating products visibility!');
-                updateProductsVisibility();
-            });
-            function updateProductsVisibility() {
-                selectedCategoryIds = $('.category-checkbox:checked').map(function () {
-                    return $(this).data('category-id');
-                }).get();
-                console.log('Selected category IDs:', selectedCategoryIds);
-                if (selectedCategoryIds.length > 0) {
-                    $('.product-item').hide();
-                    $.each(selectedCategoryIds, function (index, categoryId) {
-                        $('.product-item.category-' + categoryId).show();
-                    });
-                } else {
-                    $('.product-item').show();
-                }
-            }
-            if (selectedCategoryIds.length > 0) {
-                updateProductsVisibility();
-            }
-        });
-    </script>
-}*@

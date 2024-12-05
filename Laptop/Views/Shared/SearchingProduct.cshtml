@@ -18,7 +18,7 @@
             <div class="col-md-12">
                 <ul class="breadcrumb-tree">
                     <li><a href="/">Trang chủ</a></li>
-                    <li>Tất cả sản phẩm</li>
+                    <li><a href="/tat-ca-san-pham">Tất cả sản phẩm</a></li>
                 </ul>
             </div>
         </div>
@@ -48,6 +48,28 @@
                                 </label>
                             </div>
                         }
+                    </div>
+                </div>
+
+                <div class="aside">
+                    <h3 class="aside-title">Nhu cầu sử dụng</h3>
+                    <div class="checkbox-filter">
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="vanphong" class="need-checkbox" data-need-id="1" value="Văn phòng">
+                            <label for="vanphong"><span></span>Văn phòng</label>
+                        </div>
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="dohoa" class="need-checkbox" data-need-id="2" value="Đồ họa">
+                            <label for="dohoa"><span></span>Đồ họa</label>
+                        </div>
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="laptrinh" class="need-checkbox" data-need-id="3" value="Lập trình">
+                            <label for="laptrinh"><span></span>Lập trình</label>
+                        </div>
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="gaming" class="need-checkbox" data-need-id="4" value="Gaming">
+                            <label for="gaming"><span></span>Gaming</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -88,11 +110,16 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('.category-checkbox').change(function () {
+            function fetchFilteredData() {
                 const searchProductIds = @Html.Raw(Json.Serialize(searchProducts.Select(p => p.ProductId)));
                 const selectedCategories = [];
                 $('.category-checkbox:checked').each(function () {
                     selectedCategories.push($(this).data('category-id'));
+                });
+
+                const selectedNeeds = [];
+                $('.need-checkbox:checked').each(function () {
+                    selectedNeeds.push($(this).val());
                 });
 
                 const selectedSort = $('#sortSelect').val();
@@ -102,6 +129,7 @@
                     type: 'GET',
                     data: {
                         categoryIds: selectedCategories,
+                        needs: selectedNeeds,
                         sort: selectedSort,
                         productIds: searchProductIds
                     },
@@ -113,35 +141,17 @@
                         alert('Có lỗi xảy ra khi tải dữ liệu.');
                     }
                 });
+            }
+
+            $('.category-checkbox, .need-checkbox').change(function () {
+                fetchFilteredData();
             });
 
             $("#sortSelect").change(function () {
-                const searchProductIds = @Html.Raw(Json.Serialize(searchProducts.Select(p => p.ProductId)));
-                var selectedSort = $(this).val();
-
-                const selectedCategories = [];
-                $('.category-checkbox:checked').each(function () {
-                    selectedCategories.push($(this).data('category-id'));
-                });
-
-                $.ajax({
-                    url: '/SearchProduct/GetProductData',
-                    type: 'GET',
-                    data: {
-                        categoryIds: selectedCategories,
-                        sort: selectedSort,
-                        productIds: searchProductIds
-                    },
-                    traditional: true,
-                    success: function (data) {
-                        $('#productList').html(data);
-                    },
-                    error: function () {
-                        alert('Có lỗi xảy ra khi tải dữ liệu.');
-                    }
-                });
+                fetchFilteredData();
             });
         });
+
     </script>
 }
 
