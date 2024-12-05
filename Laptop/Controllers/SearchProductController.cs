@@ -33,7 +33,7 @@ namespace LaptopShop.Controllers
             return View();
         }
 
-        public IActionResult GetProductData(List<int> categoryIds, string sort, List<int> productIds)
+        public IActionResult GetProductData(List<int> categoryIds, string sort, List<int> productIds, List<string> needs)
         {
             // Truy vấn sản phẩm từ cơ sở dữ liệu dựa trên productIds
             var products = _context.Products
@@ -53,7 +53,45 @@ namespace LaptopShop.Controllers
                 products = products.Where(p => categoryIds.Contains(p.Product.CategoryId));
             }
 
+            // Lọc theo nhu cầu sử dụng
+            if (needs != null && needs.Count > 0)
+            {
+                foreach (var need in needs)
+                {
+                    switch (need)
+                    {
+                        case "Văn phòng":
+                            products = products.Where(p =>
+                                (p.Product.Info.Ram.Contains("8GB") || p.Product.Info.Ram.Contains("16GB")) &&
+                                p.Product.Price <= 20000000);
+                            break;
 
+                        case "Đồ họa":
+                            products = products.Where(p =>
+                                (p.Product.Info.Vga != null &&
+                                 (p.Product.Info.Vga.Contains("NVIDIA") || p.Product.Info.Vga.Contains("AMD Radeon"))) &&
+                                (p.Product.Info.Ram.Contains("16GB") || p.Product.Info.Ram.Contains("32GB")));
+                            break;
+
+                        case "Lập trình":
+                            products = products.Where(p =>
+                                (p.Product.Info.Cpu.Contains("i5") || p.Product.Info.Cpu.Contains("i7")) &&
+                                (p.Product.Info.Ram.Contains("8GB") || p.Product.Info.Ram.Contains("16GB")));
+                            break;
+
+                        case "Gaming":
+                            products = products.Where(p =>
+                                (p.Product.Info.Vga != null &&
+                                 p.Product.Info.Vga.Contains("RTX") || p.Product.Info.Vga.Contains("NVIDIA")) &&
+                                (p.Product.Info.Ram.Contains("16GB") || p.Product.Info.Ram.Contains("32GB")) &&
+                                p.Product.Price >= 20000000);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
 
             // Sắp xếp nếu có
             if (!string.IsNullOrEmpty(sort))
