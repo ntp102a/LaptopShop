@@ -86,17 +86,16 @@
         </div>
     </div>
     <!-- END CHATBOT -->
-
     @*<a href="https://www.messenger.com/e2ee/t/6524120987716915" title="Messenger" class="devvn_animation_zoom" target="_blank" rel="noopener nofollow">
-        <img width="35" height="35" src="@Url.Content("~/img/logo-512.webp")" alt="" loading="lazy">
+    <img width="35" height="35" src="@Url.Content("~/img/logo-512.webp")" alt="" loading="lazy">
     </a>
 
     <a href="https://zalo.me/0336960995" title="Zalo" class="zalo_animation_zoom" target="_blank" rel="noopener nofollow">
-        <img width="35" height="35" src="@Url.Content("~/img/img.webp")" alt="" loading="lazy">
+    <img width="35" height="35" src="@Url.Content("~/img/img.webp")" alt="" loading="lazy">
     </a>
 
     <a href="tel:+84336960995" title="Phone" class="phone_animation_zoom" target="_blank" rel="noopener nofollow">
-        <img width="35" height="35" src="@Url.Content("~/img/phone-icon-800x800.png")" alt="" loading="lazy">
+    <img width="35" height="35" src="@Url.Content("~/img/phone-icon-800x800.png")" alt="" loading="lazy">
     </a>*@
 
     <!-- Vendor JS -->
@@ -150,17 +149,28 @@
                         productID: productid
                     },
                     success: function (response) {
-                        if (response.result == 'Redirect') {
+                        if (response.result === 'Redirect') {
                             window.location = response.url;
-                        }
-                        else {
+                        } else if (response.result === 'Success') {
                             loadHeaderCart();
                             location.reload();
+                            alert(response.message);
+                        } else {
+                            alert("Có lỗi xảy ra, vui lòng thử lại.");
                         }
                         console.log(response);
                     },
-                    error: function (error) {
-                        alert("Lỗi đẩy dữ liệu lên server" + error.responseText);
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            // Lấy URL từ phản hồi server
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.result === "Redirect") {
+                                window.location = response.url;
+                            }
+                        } else {
+                            console.error("Error:", xhr.responseText);
+                            alert("Lỗi đẩy dữ liệu lên server: " + xhr.responseText);
+                        }
                     }
                 });
             });

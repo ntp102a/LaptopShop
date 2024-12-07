@@ -17,7 +17,6 @@ namespace LaptopShop.Controllers
             _notyfService = notyfService;
         }
 
-        [Authorize]
         [HttpPost]
         [Route("api/cart/add")]
         public IActionResult AddtoCart(int productID, int? amount)
@@ -26,35 +25,42 @@ namespace LaptopShop.Controllers
             {
                 var accountID = User.Identity.GetAccountID();
 
-                if (!string.IsNullOrEmpty(accountID))
+                if (string.IsNullOrEmpty(accountID))
                 {
-                    var cartItem = _context.Carts
-                        .FirstOrDefault(c => c.UserId == accountID && c.ProductId == productID);
-
-                    if (cartItem != null)
+                    return Unauthorized(new
                     {
-                        cartItem.Quantity += amount ?? 1;
-                    }
-                    else
-                    {
-                        var newCartItem = new Cart
-                        {
-                            UserId = accountID,
-                            ProductId = productID,
-                            Quantity = amount ?? 1
-                        };
+                        result = "Redirect",
+                        message = "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng.",
+                        url = Url.Action("Login", "Accounts", new { returnUrl = Request.Path })
+                    });
+                }
 
-                        _context.Carts.Add(newCartItem);
-                    }
+                var cartItem = _context.Carts
+                    .FirstOrDefault(c => c.UserId == accountID && c.ProductId == productID);
 
-                    _context.SaveChanges();
-                    _notyfService.Success("Thêm vào giỏ hàng thành công");
-                    return Json(new { success = true });
+                if (cartItem != null)
+                {
+                    cartItem.Quantity += amount ?? 1;
                 }
                 else
                 {
-                    return Json(new { success = false, error = "Lỗi khi xử lý giỏ hàng" });
+                    var newCartItem = new Cart
+                    {
+                        UserId = accountID,
+                        ProductId = productID,
+                        Quantity = amount ?? 1
+                    };
+
+                    _context.Carts.Add(newCartItem);
                 }
+
+                _context.SaveChanges();
+                return Json(new
+                {
+                    result = "Success",
+                    message = "Thêm vào giỏ hàng thành công"
+                });
+
             }
             catch (Exception ex)
             {

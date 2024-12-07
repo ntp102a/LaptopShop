@@ -186,7 +186,7 @@ namespace LaptopShop.Controllers
                 var productDetails = await _context.Products
                     .Include(p => p.Info)
                     .Include(p => p.Image)
-                    .Where(p => p.ProductName.Contains(productNameOrId) || p.ProductId.ToString() == productNameOrId)
+                    .Where(p => (p.ProductName.Contains(productNameOrId) || p.ProductId.ToString() == productNameOrId) && (p.IsPublic == true))
                     .Select(p => new
                     {
                         p.ProductName,
