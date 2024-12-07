@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using LaptopShop.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace LaptopShop.Controllers
 {
@@ -17,11 +19,14 @@ namespace LaptopShop.Controllers
     public class AccountsController : Controller
     {
         private readonly laptopWebContext _context;
+        private readonly IConfiguration _configuration;
+
         public INotyfService _notyfService { get; }
-        public AccountsController(laptopWebContext context, INotyfService notyfService)
+        public AccountsController(laptopWebContext context, INotyfService notyfService, IConfiguration configuration)
         {
             _context = context;
             _notyfService = notyfService;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -118,6 +123,8 @@ namespace LaptopShop.Controllers
                     }
 
                     string salt = Utilities.GetRandomKey();
+                    string verificationCode = new Random().Next(100000, 999999).ToString();
+
                     User khachhang = new User
                     {
                         UserId = Guid.NewGuid().ToString(),
@@ -126,27 +133,31 @@ namespace LaptopShop.Controllers
                         Email = taikhoan.Email.Trim().ToLower(),
                         Password = (taikhoan.Password + salt.Trim()).ToMD5(),
                         Salt = salt,
-                        RoleId = 2
+                        RoleId = 2,
+                        isVerified = false,
                     };
                     try
                     {
                         _context.Add(khachhang);
                         await _context.SaveChangesAsync();
 
+                        var UrlVerifiAccount = Url.Action("VerifyAccount", "Accounts", new { userId = khachhang.UserId }, Request.Scheme);
+
                         //Luu session UserId
                         HttpContext.Session.SetString("UserId", khachhang.UserId.ToString());
                         var taikhoanID = HttpContext.Session.GetString("UserId");
+						//Gửi email xác nhận
+						string subject = "Xác nhận tài khoản đăng ký";
+						string body = $"<p>Xin chào {khachhang.FullName},</p>" +
+									  $"<p>Bạn đã đăng ký tài khoản tại hệ thống của chúng tôi. Vui lòng nhấn vào liên kết bên dưới để kích hoạt tài khoản:</p>" +
+									  $"<p><a href='{UrlVerifiAccount}'>Xác nhận tài khoản</a></p>" +
+									  $"<p>Trân trọng,<br>Đội ngũ hỗ trợ</p>";
 
-                        var claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.Name, khachhang.FullName),
-                            new Claim("UserId", khachhang.UserId.ToString())
-                        };
-                        ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "login");
-                        ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-                        await HttpContext.SignInAsync(claimsPrincipal);
-                        _notyfService.Success("Đăng ký thành công");
-                        return RedirectToAction("Dashboard", "Accounts");
+						EmailService emailService = new EmailService(_configuration);
+                        await emailService.SendEmailAsync(khachhang.Email, subject, body);
+                        _notyfService.Success("Đăng ký thành công. Vui lòng kiểm tra email.");
+
+                        return RedirectToAction("Login", "Accounts");
                     }
                     catch
                     {
@@ -164,7 +175,46 @@ namespace LaptopShop.Controllers
             }
         }
 
-        [AllowAnonymous]
+		[HttpGet("VerifyAccount")]
+		public async Task<IActionResult> VerifyAccount(string userId)
+		{
+			// Tìm người dùng theo userId
+			var user = _context.Users.FirstOrDefault(x => x.UserId == userId);
+			if (user == null)
+			{
+				return NotFound("Người dùng không tồn tại.");
+			}
+
+			// Kiểm tra xem tài khoản đã được xác nhận chưa
+			if (user.isVerified)
+			{
+				_notyfService.Success("Tài khoản đã được xác nhận trước đó.");
+				return RedirectToAction("Login", "Accounts");
+			}
+
+			// Xác nhận tài khoản
+			user.isVerified = true;
+			_context.SaveChanges();
+
+			// Tạo thông tin đăng nhập và đăng nhập người dùng
+			var claims = new List<Claim>
+	        {
+		        new Claim(ClaimTypes.Name, user.FullName),
+		        new Claim("UserId", user.UserId),
+		        new Claim(ClaimTypes.Email, user.Email),
+		        new Claim(ClaimTypes.Role, user.RoleId.ToString()),
+	        };
+			ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "login");
+			ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+			await HttpContext.SignInAsync(claimsPrincipal);
+			_notyfService.Success("Tài khoản đã được xác nhận và đăng nhập thành công.");
+			// Redirect đến trang chủ hoặc trang Dashboard sau khi đăng nhập
+			return RedirectToAction("Index", "Home");
+		}
+
+
+
+		[AllowAnonymous]
         [Route("/dang-nhap", Name = "DangNhap")]
         public IActionResult Login(string returnUrl = null)
         {
@@ -195,6 +245,11 @@ namespace LaptopShop.Controllers
                     _notyfService.Error("Thông tin đăng nhập chưa chính xác");
                     return RedirectToAction("Login");
                 }
+                if(!khachhang.isVerified)
+                {
+					_notyfService.Warning("Tài khoản của bạn chưa được xác minh. Vui lòng kiểm tra email để xác nhận.");
+					return RedirectToAction("Login");
+				}
 
                 string pass = (customer.Password + khachhang.Salt.Trim()).ToMD5();
 
@@ -212,7 +267,8 @@ namespace LaptopShop.Controllers
                     {
                         new Claim(ClaimTypes.Name, khachhang.FullName),
                         new Claim("UserId", khachhang.UserId.ToString()),
-                        new Claim(ClaimTypes.Role, khachhang.RoleId.ToString())
+                        new Claim(ClaimTypes.Role, khachhang.RoleId.ToString()),
+                        new Claim(ClaimTypes.Email, khachhang.Email),
                     };
                 ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "login");
                 ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
