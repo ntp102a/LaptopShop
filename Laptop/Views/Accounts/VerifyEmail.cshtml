@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Xác thực Email";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center">Xác thực Email</h2>
+    <p class="text-center">Vui lòng nhập mã xác thực đã được gửi đến email của bạn.</p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form asp-action="VerifyEmail" asp-route-email="@ViewBag.Email" method="post">
+                <div class="form-group">
+                    <label for="code">Mã xác thực:</label>
+                    <input type="text" class="form-control" id="code" name="code" placeholder="Nhập mã xác thực" required maxlength="6" />
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block mt-3">Xác thực</button>
+
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger mt-3">@ViewBag.ErrorMessage</div>
+                }
+            </form>
+            <p class="text-center mt-3">
+                Không nhận được mã?
+                <a href="javascript:void(0);" onclick="resendVerificationCode()">Gửi lại mã</a>
+                <span id="loadingSpinner" style="display:none;"> <i class="fa fa-spinner fa-spin"></i> Đang gửi....</span>
+            </p>
+
+            @*<p class="text-center mt-3">
+            Không nhận được mã? <a asp-action="ResendVerificationCode" asp-route-email="@ViewBag.Email">Gửi lại mã</a>
+            </p>*@
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function resendVerificationCode() {
+            $('a[href="javascript:void(0);"]').hide();
+            $('#loadingSpinner').show();
+
+            $.ajax({
+                type: "GET",
+                url: '/xac-thuc-tai-khoan/' + encodeURIComponent('@ViewBag.Email') + '/resend',
+                success: function (response) {
+                    alert(response.message);
+                },
+                error: function (xhr, status, error) {
+                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                },
+                complete: function () {
+                    $('#loadingSpinner').hide();
+                    $('a[href="javascript:void(0);"]').show();
+                }
+            });
+        }
+    </script>
+}
+@section Styles {
+    <style>
+        #loadingSpinner {
+            display: none;
+            color: #007bff;
+            font-size: 1.2em;
+            margin-left: 10px;
+        }
+    </style>
+}

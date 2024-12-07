@@ -10,6 +10,6 @@
         public string? Phone { get; set; }
         public string? Salt { get; set; }
         public int? RoleId { get; set; }
-        public bool? isVerified { get; set; }
+        public bool? IsVerified { get; set; }
     }
 }

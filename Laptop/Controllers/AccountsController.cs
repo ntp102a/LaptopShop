@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using LaptopShop.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace LaptopShop.Controllers
 {
@@ -20,13 +21,14 @@ namespace LaptopShop.Controllers
     {
         private readonly laptopWebContext _context;
         private readonly IConfiguration _configuration;
-
+        private readonly IMemoryCache _cache;
         public INotyfService _notyfService { get; }
-        public AccountsController(laptopWebContext context, INotyfService notyfService, IConfiguration configuration)
+        public AccountsController(laptopWebContext context, INotyfService notyfService, IConfiguration configuration, IMemoryCache cache)
         {
             _context = context;
             _notyfService = notyfService;
             _configuration = configuration;
+            _cache = cache;
         }
 
         [HttpGet]
@@ -80,7 +82,7 @@ namespace LaptopShop.Controllers
         [Route("/tai-khoan-cua-toi", Name = "Dashboard")]
         public IActionResult Dashboard()
         {
-            var taikhoanID = HttpContext.Session.GetString("UserId");
+            var taikhoanID = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
             if (taikhoanID != null)
             {
                 var khachhang = _context.Users
@@ -124,6 +126,7 @@ namespace LaptopShop.Controllers
 
                     string salt = Utilities.GetRandomKey();
                     string verificationCode = new Random().Next(100000, 999999).ToString();
+                    SaveVerificationCode(taikhoan.Email, verificationCode);
 
                     User khachhang = new User
                     {
@@ -134,30 +137,31 @@ namespace LaptopShop.Controllers
                         Password = (taikhoan.Password + salt.Trim()).ToMD5(),
                         Salt = salt,
                         RoleId = 2,
-                        isVerified = false,
+                        IsVerified = false,
                     };
                     try
                     {
                         _context.Add(khachhang);
                         await _context.SaveChangesAsync();
 
-                        var UrlVerifiAccount = Url.Action("VerifyAccount", "Accounts", new { userId = khachhang.UserId }, Request.Scheme);
+                        //var UrlVerifiAccount = Url.Action("VerifyAccount", "Accounts", new { userId = khachhang.UserId }, Request.Scheme);
 
                         //Luu session UserId
-                        HttpContext.Session.SetString("UserId", khachhang.UserId.ToString());
-                        var taikhoanID = HttpContext.Session.GetString("UserId");
-						//Gửi email xác nhận
-						string subject = "Xác nhận tài khoản đăng ký";
-						string body = $"<p>Xin chào {khachhang.FullName},</p>" +
-									  $"<p>Bạn đã đăng ký tài khoản tại hệ thống của chúng tôi. Vui lòng nhấn vào liên kết bên dưới để kích hoạt tài khoản:</p>" +
-									  $"<p><a href='{UrlVerifiAccount}'>Xác nhận tài khoản</a></p>" +
-									  $"<p>Trân trọng,<br>Đội ngũ hỗ trợ</p>";
+                        HttpContext.Session.SetString("Email", taikhoan.Email);
+                        //Gửi email xác nhận
+                        string subject = "Xác nhận tài khoản đăng ký";
+                        string body = $"<p>Xin chào {khachhang.FullName},</p>" +
+                                      $"<p>Bạn đã đăng ký tài khoản tại hệ thống của chúng tôi. Đây là mã xác nhận tài khoản của bạn:</p>" +
+                                      $"<p>Mã xác nhận: {verificationCode}</p>" +
+                                      $"<p>Trân trọng,<br>Đội ngũ hỗ trợ</p>";
 
-						EmailService emailService = new EmailService(_configuration);
+                        EmailService emailService = new EmailService(_configuration);
                         await emailService.SendEmailAsync(khachhang.Email, subject, body);
                         _notyfService.Success("Đăng ký thành công. Vui lòng kiểm tra email.");
 
-                        return RedirectToAction("Login", "Accounts");
+                        //return RedirectToAction("Login", "Accounts");
+                        TempData["Email"] = taikhoan.Email;
+                        return RedirectToAction("VerifyEmail", new { email = khachhang.Email });
                     }
                     catch
                     {
@@ -175,46 +179,103 @@ namespace LaptopShop.Controllers
             }
         }
 
-		[HttpGet("VerifyAccount")]
-		public async Task<IActionResult> VerifyAccount(string userId)
-		{
-			// Tìm người dùng theo userId
-			var user = _context.Users.FirstOrDefault(x => x.UserId == userId);
-			if (user == null)
-			{
-				return NotFound("Người dùng không tồn tại.");
-			}
+        public void SaveVerificationCode(string email, string code)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+            };
 
-			// Kiểm tra xem tài khoản đã được xác nhận chưa
-			if (user.isVerified)
-			{
-				_notyfService.Success("Tài khoản đã được xác nhận trước đó.");
-				return RedirectToAction("Login", "Accounts");
-			}
+            _cache.Set(email, code, cacheEntryOptions);
+        }
+        public bool VerifyCode(string email, string enteredCode)
+        {
+            if (_cache.TryGetValue(email, out string storedCode))
+            {
+                return storedCode == enteredCode;
+            }
 
-			// Xác nhận tài khoản
-			user.isVerified = true;
-			_context.SaveChanges();
+            return false;
+        }
 
-			// Tạo thông tin đăng nhập và đăng nhập người dùng
-			var claims = new List<Claim>
-	        {
-		        new Claim(ClaimTypes.Name, user.FullName),
-		        new Claim("UserId", user.UserId),
-		        new Claim(ClaimTypes.Email, user.Email),
-		        new Claim(ClaimTypes.Role, user.RoleId.ToString()),
-	        };
-			ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "login");
-			ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-			await HttpContext.SignInAsync(claimsPrincipal);
-			_notyfService.Success("Tài khoản đã được xác nhận và đăng nhập thành công.");
-			// Redirect đến trang chủ hoặc trang Dashboard sau khi đăng nhập
-			return RedirectToAction("Index", "Home");
-		}
+        [AllowAnonymous]
+        [Route("xac-thuc-tai-khoan/{email}")]
+        public IActionResult VerifyEmail(string email)
+        {
+            ViewBag.Email = email;
+            return View();
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("xac-thuc-tai-khoan/{email}")]
+        public async Task<IActionResult> VerifyEmail(string email, string code)
+        {
+            if (email == null)
+            {
+                _notyfService.Error("Không tìm thấy Email");
+                return RedirectToAction("DangKyTaiKhoan", "Accounts");
+            }
+            if (VerifyCode(email, code))
+            {
+                
+                var taikhoan = _context.Users.FirstOrDefault(p => p.Email == email);
+                if (taikhoan == null)
+                {
+                    _notyfService.Error("Không tìm thấy tài khoản");
+                    return RedirectToAction("DangKyTaiKhoan", "Accounts");
+                }
+                else
+                {
+                    taikhoan.IsVerified = true;
+                    _context.Update(taikhoan);
+                    _context.SaveChanges();
+                }
 
+                // Tạo Claims
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, taikhoan.FullName),
+                    new Claim("UserId", taikhoan.UserId),
+                    new Claim(ClaimTypes.Role, taikhoan.RoleId.ToString()),
+                    new Claim(ClaimTypes.Email, taikhoan.Email)
 
+                };
+                ClaimsIdentity identity = new ClaimsIdentity(claims, "login");
+                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
-		[AllowAnonymous]
+                await HttpContext.SignInAsync(principal);
+
+                _cache.Remove(email);
+
+                _notyfService.Success("Xác thực tài khoản thành công");
+                return RedirectToAction("Index", "Home");
+            }
+            _notyfService.Error("Mã xác thực không đúng hoặc đã hết hạn.");
+            ViewBag.Email = email;
+            return View();
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("xac-thuc-tai-khoan/{email}/resend")]
+        public async Task<IActionResult> ResendVerificationCode(string email)
+        {
+            var khachhang = _context.Users.FirstOrDefault(p => p.Email == email);
+            string verificationCode = new Random().Next(100000, 999999).ToString();
+            SaveVerificationCode(email, verificationCode);
+
+            //Gửi email xác nhận
+            string subject = "Xác nhận tài khoản đăng ký";
+            string body = $"<p>Xin chào {khachhang.FullName},</p>" +
+                          $"<p>Bạn đã đăng ký tài khoản tại hệ thống của chúng tôi. Đây là mã xác nhận tài khoản của bạn:</p>" +
+                          $"<p>Mã xác nhận: {verificationCode}</p>" +
+                          $"<p>Trân trọng,<br>Đội ngũ hỗ trợ</p>";
+
+            EmailService emailService = new EmailService(_configuration);
+            await emailService.SendEmailAsync(khachhang.Email, subject, body);
+            return Json(new { success = true, message = "Mã xác thực mới đã được gửi! Vui lòng kiểm tra email." });
+        }
+
+        [AllowAnonymous]
         [Route("/dang-nhap", Name = "DangNhap")]
         public IActionResult Login(string returnUrl = null)
         {
@@ -223,7 +284,6 @@ namespace LaptopShop.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-
 
             return View();
         }
@@ -245,11 +305,6 @@ namespace LaptopShop.Controllers
                     _notyfService.Error("Thông tin đăng nhập chưa chính xác");
                     return RedirectToAction("Login");
                 }
-                if(!khachhang.isVerified)
-                {
-					_notyfService.Warning("Tài khoản của bạn chưa được xác minh. Vui lòng kiểm tra email để xác nhận.");
-					return RedirectToAction("Login");
-				}
 
                 string pass = (customer.Password + khachhang.Salt.Trim()).ToMD5();
 
@@ -257,6 +312,12 @@ namespace LaptopShop.Controllers
                 {
                     _notyfService.Error("Thông tin đăng nhập chưa chính xác");
                     return RedirectToAction("Login");
+                }
+
+                if (!khachhang.IsVerified)
+                {
+                    _notyfService.Warning("Tài khoản của bạn chưa được xác minh. Vui lòng kiểm tra email để xác nhận.");
+                    return RedirectToAction("VerifyEmail", new { email = customer.Email });
                 }
 
                 HttpContext.Session.SetString("UserId", khachhang.UserId.ToString());
