@@ -232,6 +232,7 @@
     }
 
     .chatbot {
+        display: none;
         position: fixed;
         right: 35px;
         bottom: 90px;
@@ -249,6 +250,7 @@
     }
 
     body.show-chatbot .chatbot {
+        display: block;
         opacity: 1;
         pointer-events: auto;
         transform: scale(1);
@@ -487,6 +489,7 @@
     });
 
     sendChatBtn.addEventListener("click", handleChat);
+
     closeBtn.addEventListener("click", () =>
         document.body.classList.remove("show-chatbot")
     );

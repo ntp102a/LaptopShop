@@ -20,7 +20,7 @@ namespace LaptopShop.Models
         public string? Phone { get; set; }
         public int? RoleId { get; set; }
         public string? Salt { get; set; }
-        public bool isVerified { get; set; } = false;
+        public bool IsVerified { get; set; } = false;
 
         public virtual Role? Role { get; set; }
         public virtual ICollection<Cart> Carts { get; set; }
