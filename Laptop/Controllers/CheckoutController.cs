@@ -7,9 +7,11 @@ using LaptopShop.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PayPal.Core;
 using PayPal.v1.Payments;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace LaptopShop.Controllers
 {
@@ -18,16 +20,18 @@ namespace LaptopShop.Controllers
         private readonly laptopWebContext _context;
         private readonly string _clientId;
         private readonly string _clientSecret;
+        private readonly IConfiguration _configuration;
         public double TyGiaUSD = 24535;
         private readonly IVnPayService _vnPayservice;
         public INotyfService _notyfService { get; }
-        public CheckoutController(laptopWebContext context, INotyfService notyfService, IConfiguration config, IVnPayService vnPayservice)
+        public CheckoutController(laptopWebContext context, INotyfService notyfService, IConfiguration config, IVnPayService vnPayservice, IConfiguration configuration)
         {
             _context = context;
             _notyfService = notyfService;
             _clientId = config["PayPalSettings:clientId"];
             _clientSecret = config["PayPalSettings:clientSecret"];
             _vnPayservice = vnPayservice;
+            _configuration = configuration;
         }
 
         public List<Cart> GioHang
@@ -307,12 +311,29 @@ namespace LaptopShop.Controllers
         }
 
 
+
+        private string GenerateOrderTableHtml(List<dynamic> orderDetails)
+        {
+            string table = "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+            table += "<thead><tr><th>Sản phẩm</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead><tbody>";
+
+            foreach (var item in orderDetails)
+            {
+                table += $"<tr><td>{item.ProductName}</td><td>{item.Quantity}</td><td>{item.Price:C}</td><td>{item.Total:C}</td></tr>";
+            }
+
+            table += "</tbody></table>";
+            return table;
+        }
+
+
         [Route("dat-hang-thanh-cong", Name = "Success")]
         public IActionResult Success()
         {
             try
             {
                 var accountID = User.Identity.GetAccountID();
+                var email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
 
                 if (!string.IsNullOrEmpty(accountID))
                 {
@@ -328,8 +349,39 @@ namespace LaptopShop.Controllers
                             FullName = donhang.RecipientName,
                             DonHangID = donhang.OrderId,
                             Phone = donhang.Phone,
-                            Address = donhang.Address
+                            Address = donhang.Address,
                         };
+
+                        var orderDetails = _context.OrderDetails
+                            .Where(od => od.OrderId == donhang.OrderId)
+                            .Select(od => new
+                            {
+                                od.Product.ProductName,
+                                od.Quantity,
+                                od.Price,
+                                Total = od.Quantity * od.Price
+                            })
+                            .ToList()
+                            .Select(item => (dynamic)item)
+                            .ToList();
+
+
+
+                        string orderTableHtml = GenerateOrderTableHtml(orderDetails);
+
+                        // Nội dung email
+                        string subject = $"Đơn hàng #{donhang.OrderId} của bạn đã được đặt thành công";
+                        string body = $"<h3>Xin chào {successVM.FullName},</h3>" +
+                                      $"<p>Cảm ơn bạn đã mua sắm tại cửa hàng chúng tôi. Dưới đây là thông tin chi tiết đơn hàng:</p>" +
+                                      $"{orderTableHtml}" +
+                                      $"<p>Chúng tôi sẽ liên hệ với bạn qua số điện thoại {successVM.Phone}.</p>" +
+                                      "<p>Trân trọng,</p>" +
+                                      "<p>Đội ngũ hỗ trợ khách hàng.</p>";
+
+                        // Gửi email
+                        EmailService emailService = new EmailService(_configuration);
+                        emailService.SendEmailAsync(email, subject, body);
+
 
                         var cartItems = _context.Carts
                             .Where(c => c.UserId == accountID)

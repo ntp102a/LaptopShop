@@ -323,7 +323,7 @@ namespace LaptopShop.Models
                     .HasColumnName("phone");
 
                 entity.Property(e => e.RoleId).HasColumnName("roleId");
-                entity.Property(e => e.RoleId).HasColumnName("isVerified");
+                entity.Property(e => e.isVerified).HasColumnName("isVerified");
 
                 entity.Property(e => e.Salt)
                     .HasMaxLength(8)
