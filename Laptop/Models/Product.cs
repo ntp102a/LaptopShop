@@ -21,6 +21,7 @@ namespace LaptopShop.Models
         public int? Discount { get; set; }
         public int? Instock { get; set; }
         public int? ImageId { get; set; }
+        public bool? IsPublic { get; set; }
 
         public virtual Category? Category { get; set; }
         public virtual Image? Image { get; set; }

@@ -27,6 +27,7 @@ namespace LaptopShop.Controllers
                 .AsNoTracking()
                 .Include(p => p.Image)
                 .Include(p => p.Info)
+                .Where(p => p.IsPublic == true)
                 .OrderByDescending(x => x.Info.Date)
                 .ToList();
 
@@ -211,7 +212,7 @@ namespace LaptopShop.Controllers
                     .Include(p => p.Image)
                     .Include(p => p.Info)
                     .Include(p => p.Category)
-                    .Where(x => x.CategoryId == product.CategoryId && x.ProductName != name)
+                    .Where(x => x.CategoryId == product.CategoryId && x.ProductName != name && x.IsPublic == true)
                     .OrderByDescending(x => x.Price)
                     .Take(4)
                     .ToList();
@@ -270,6 +271,7 @@ namespace LaptopShop.Controllers
                 .AsNoTracking()
                 .Include(p => p.Image)
                 .Include(p => p.Info)
+                .Where(p => p.IsPublic == true)
                 .Select(p => new
                 {
                     Product = p,
@@ -291,29 +293,22 @@ namespace LaptopShop.Controllers
                     {
                         case "Văn phòng":
                             products = products.Where(p =>
-                                (p.Product.Info.Ram.Contains("8GB") || p.Product.Info.Ram.Contains("16GB")) &&
-                                p.Product.Price <= 20000000);
+                                (p.Product.Info.Ram.Contains("8GB") || p.Product.Info.Ram.Contains("16GB")) && p.Product.Price <= 20000000);
                             break;
 
                         case "Đồ họa":
                             products = products.Where(p =>
                                 (p.Product.Info.Vga != null &&
-                                 (p.Product.Info.Vga.Contains("NVIDIA") || p.Product.Info.Vga.Contains("AMD Radeon"))) &&
-                                (p.Product.Info.Ram.Contains("16GB") || p.Product.Info.Ram.Contains("32GB")));
+                                 (p.Product.Info.Vga.Contains("NVIDIA") || p.Product.Info.Vga.Contains("AMD Radeon"))) && (p.Product.Info.Ram.Contains("16GB") || p.Product.Info.Ram.Contains("32GB")));
                             break;
 
                         case "Lập trình":
-                            products = products.Where(p =>
-                                (p.Product.Info.Cpu.Contains("i5") || p.Product.Info.Cpu.Contains("i7")) &&
-                                (p.Product.Info.Ram.Contains("8GB") || p.Product.Info.Ram.Contains("16GB")));
+                            products = products.Where(p => (p.Product.Info.Cpu.Contains("i5") || p.Product.Info.Cpu.Contains("i7")) && (p.Product.Info.Ram.Contains("8GB") || p.Product.Info.Ram.Contains("16GB")));
                             break;
 
                         case "Gaming":
                             products = products.Where(p =>
-                                (p.Product.Info.Vga != null &&
-                                 p.Product.Info.Vga.Contains("RTX")) &&
-                                (p.Product.Info.Ram.Contains("16GB") || p.Product.Info.Ram.Contains("32GB")) &&
-                                p.Product.Price >= 20000000);
+                                (p.Product.Info.Vga != null && p.Product.Info.Vga.Contains("RTX")) && (p.Product.Info.Ram.Contains("16GB") || p.Product.Info.Ram.Contains("32GB")) && p.Product.Price >= 20000000);
                             break;
 
                         default:

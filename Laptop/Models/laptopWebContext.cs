@@ -252,6 +252,7 @@ namespace LaptopShop.Models
                 entity.Property(e => e.Instock).HasColumnName("instock");
 
                 entity.Property(e => e.Price).HasColumnName("price");
+                entity.Property(e => e.IsPublic).HasColumnName("is_public");
 
                 entity.Property(e => e.ProductName)
                     .HasMaxLength(255)

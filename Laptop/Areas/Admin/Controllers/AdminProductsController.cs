@@ -41,7 +41,7 @@ namespace LaptopShop.Areas.Admin.Controllers
             {
                 IsProducts = _context.Products
                     .AsNoTracking()
-                    .Where(x => x.CategoryId == category_id)
+                    .Where(x => x.CategoryId == category_id && x.IsPublic == true)
                     .Include(x => x.Category)
                     .OrderByDescending(x => x.ProductId)
                     .ToList();
@@ -51,6 +51,7 @@ namespace LaptopShop.Areas.Admin.Controllers
                 IsProducts = _context.Products
                     .AsNoTracking()
                     .Include(x => x.Category)
+                    .Where(x => x.IsPublic == true)
                     .OrderByDescending(x => x.ProductId)
                     .ToList();
             }
@@ -300,20 +301,21 @@ namespace LaptopShop.Areas.Admin.Controllers
             var product = await _context.Products.FindAsync(id);
             if (product != null)
             {
-                _context.Products.Remove(product);
+                product.IsPublic = false;
+                _context.Update(product);
             }
 
-            var info = await _context.Information.FindAsync(product.InfoId);
-            if (info != null)
-            {
-                _context.Information.Remove(info);
-            }
+            //var info = await _context.Information.FindAsync(product.InfoId);
+            //if (info != null)
+            //{
+            //    _context.Information.Remove(info);
+            //}
 
-            var image = await _context.Images.FindAsync(product.ImageId);
-            if (image != null)
-            {
-                _context.Images.Remove(image);
-            }
+            //var image = await _context.Images.FindAsync(product.ImageId);
+            //if (image != null)
+            //{
+            //    _context.Images.Remove(image);
+            //}
 
             var cart = _context.Carts.Include(x => x.Product).Where(x => x.ProductId == id).ToList();
             if (cart != null)
@@ -324,14 +326,14 @@ namespace LaptopShop.Areas.Admin.Controllers
                 }
             }
 
-            var order = _context.OrderDetails.Include(x => x.Product).Where(x => x.ProductId == id).ToList();
-            if (order != null)
-            {
-                foreach (var item in order)
-                {
-                    _context.OrderDetails.Remove(item);
-                }
-            }
+            //var order = _context.OrderDetails.Include(x => x.Product).Where(x => x.ProductId == id).ToList();
+            //if (order != null)
+            //{
+            //    foreach (var item in order)
+            //    {
+            //        _context.OrderDetails.Remove(item);
+            //    }
+            //}
 
             await _context.SaveChangesAsync();
             _notyfService.Success("Xoá sản phẩm thành công");

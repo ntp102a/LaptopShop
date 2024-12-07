@@ -24,6 +24,7 @@ namespace LaptopShop.Controllers
             var lsProducts = _context.Products
                 .AsNoTracking()
                 .Include(p => p.Image)
+                .Where(p => p.IsPublic == true)
                 .OrderByDescending(x => x.ProductId)
                 .Take(12)
                 .ToList();
@@ -34,10 +35,10 @@ namespace LaptopShop.Controllers
                 .Include(x => x.Product.Image)
                 .GroupBy(x => x.ProductId)
                 .Select(g => new
-                        {
-                            ProductId = g.Key,
-                            Count = g.Count()
-                        })
+                {
+                    ProductId = g.Key,
+                    Count = g.Count(),
+                })
                 .Where(p => p.Count > 2)
                 .Select(p => p.ProductId)
                 .Take(12)
@@ -47,7 +48,7 @@ namespace LaptopShop.Controllers
             var gameProducts = _context.Products
                 .AsNoTracking()
                 .Include(p => p.Image)
-                .Where(p => p.Description.Contains("game"))
+                .Where(p => p.Description.Contains("game") && p.IsPublic == true)
                 .Take(12)
                 .ToList();
 
