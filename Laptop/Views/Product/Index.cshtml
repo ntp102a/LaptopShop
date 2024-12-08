@@ -34,7 +34,16 @@
         <div class="row">
             <!-- Filter -->
             <div id="aside" class="col-md-3">
-                
+                <div class="aside">
+                    <h3 class="aside-title">Giá tiền</h3>
+                    <div class="price-filter">
+                        <input type="range" id="price-range" min="0" max="80000000" step="1000000" value="80000000" class="price-slider">
+                        <div class="price-values">
+                            <span id="min-price">0</span> - <span id="max-price">80.000.000</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="aside">
                     <h3 class="aside-title">Hãng</h3>
                     <div class="checkbox-filter">
@@ -81,7 +90,7 @@
                 <div class="store-filter clearfix">
                     <div class="store-sort">
                         <label>
-                            Sort:
+                            Sắp xếp:
                             <select id="sortSelect" class="sort-select">
                                 <option value="0">Tất cả</option>
                                 <option value="1">Tăng dần theo giá</option>
@@ -92,17 +101,16 @@
                         </label>
 
                         @*<label>
-                            Show:
-                            <select id="pageSizeSelect" class="show-select">
-                                <option value="12" selected>12</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                            </select>
+                        Show:
+                        <select id="pageSizeSelect" class="show-select">
+                        <option value="12" selected>12</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        </select>
                         </label>*@
                     </div>
                 </div>
                 <!-- End Sort -->
-
                 <!-- List Products -->
                 <div id="productList" class="row">
                     @await Html.PartialAsync("_ProductsPartialView", allProducts)
@@ -111,21 +119,21 @@
                 <!-- /store products -->
                 <!-- store bottom filter -->
                 @*<div class="store-filter clearfix">
-                    <ul class="store-pagination">
-                        @for (int i = 1; i <= Model.PageCount; i++)
-                        {
-                            <li class="@(i == ViewBag.CurrentPages ? "active" : "")">
-                                @if (i != ViewBag.CurrentPages)
-                                {
-                                    <a href="@Url.RouteUrl("ShopProduct", new { page = i })">@i</a>
-                                }
-                                else
-                                {
-                                    <span>@i</span>
-                                }
-                            </li>
-                        }
-                    </ul>
+                <ul class="store-pagination">
+                @for (int i = 1; i <= Model.PageCount; i++)
+                {
+                <li class="@(i == ViewBag.CurrentPages ? "active" : "")">
+                @if (i != ViewBag.CurrentPages)
+                {
+                <a href="@Url.RouteUrl("ShopProduct", new { page = i })">@i</a>
+                }
+                else
+                {
+                <span>@i</span>
+                }
+                </li>
+                }
+                </ul>
                 </div>*@
                 <!-- /store bottom filter -->
 
@@ -141,42 +149,54 @@
 
 @section Scripts {
     <script>
+
+        function formatCurrency(amount) {
+            return Number(amount).toLocaleString('vi-VN');
+        }
+
+        const priceSlider = document.getElementById('price-range');
+        const minPrice = document.getElementById('min-price');
+        const maxPrice = document.getElementById('max-price');
+
+        priceSlider.addEventListener('input', function () {
+            let value = priceSlider.value;
+            maxPrice.textContent = formatCurrency(value);
+        });
+
         $(document).ready(function () {
-            // Hàm gửi dữ liệu lọc
             function applyFilters() {
-                // Lấy danh sách các hãng được chọn
                 const selectedCategories = [];
                 $('.category-checkbox:checked').each(function () {
                     const categoryId = $(this).data('category-id');
                     if (categoryId) {
-                        selectedCategories.push(categoryId); // Hãng
+                        selectedCategories.push(categoryId);
                     }
                 });
 
-                // Lấy danh sách nhu cầu sử dụng được chọn
                 const selectedNeeds = [];
                 $('.need-checkbox:checked').each(function () {
                     const needValue = $(this).val();
                     if (!$(this).data('category-id') && needValue) {
-                        selectedNeeds.push(needValue); // Nhu cầu sử dụng
+                        selectedNeeds.push(needValue);
                     }
                 });
 
-                // Lấy thứ tự sắp xếp
                 const selectedSort = $('#sortSelect').val();
 
-                // Gửi dữ liệu qua AJAX
+                const maxPrice = $('#price-range').val();
+
                 $.ajax({
                     url: '/Product/GetProductData',
                     type: 'GET',
                     data: {
-                        categoryIds: selectedCategories, // Hãng
-                        needs: selectedNeeds, // Nhu cầu sử dụng
-                        sort: selectedSort // Sắp xếp
+                        categoryIds: selectedCategories,
+                        needs: selectedNeeds,
+                        sort: selectedSort,
+                        maxPrice: maxPrice
                     },
                     traditional: true,
                     success: function (data) {
-                        $('#productList').html(data); // Hiển thị sản phẩm
+                        $('#productList').html(data);
                     },
                     error: function () {
                         alert('Có lỗi xảy ra khi tải dữ liệu.');
@@ -184,17 +204,21 @@
                 });
             }
 
-            // Lắng nghe sự kiện thay đổi checkbox
+            
             $('.category-checkbox').change(function () {
                 applyFilters();
             });
-            // Lắng nghe sự kiện thay đổi checkbox
+            
             $('.need-checkbox').change(function () {
                 applyFilters();
             });
 
-            // Lắng nghe sự kiện thay đổi sắp xếp
             $("#sortSelect").change(function () {
+                applyFilters();
+            });
+            $("#price-range").on('input', function () {
+                const maxPrice = $(this).val();
+                $('#max-price').text(Number(maxPrice).toLocaleString('vi-VN') + " VND");
                 applyFilters();
             });
         });

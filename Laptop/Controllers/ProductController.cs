@@ -264,7 +264,7 @@ namespace LaptopShop.Controllers
 
             return RedirectToAction("Details", new { name = reviews.Products.ProductName });
         }
-        public IActionResult GetProductData(List<int> categoryIds, List<string> needs, int? sort)
+        public IActionResult GetProductData(List<int> categoryIds, List<string> needs, int? sort, int? maxPrice)
         {
             // Truy vấn sản phẩm từ cơ sở dữ liệu dựa trên productIds
             var products = _context.Products
@@ -277,6 +277,11 @@ namespace LaptopShop.Controllers
                     Product = p,
                     FinalPrice = (decimal)p.Price * (100 - (decimal)p.Discount) / 100
                 });
+
+            if(maxPrice != null)
+            {
+                products = products.Where(p => p.FinalPrice <= maxPrice);
+            }
 
             // Lọc theo categoryIds
             if (categoryIds != null && categoryIds.Any())

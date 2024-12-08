@@ -33,7 +33,7 @@ namespace LaptopShop.Controllers
             return View();
         }
 
-        public IActionResult GetProductData(List<int> categoryIds, string sort, List<int> productIds, List<string> needs)
+        public IActionResult GetProductData(List<int> categoryIds, string sort, List<int> productIds, List<string> needs, int? maxPrice)
         {
             // Truy vấn sản phẩm từ cơ sở dữ liệu dựa trên productIds
             var products = _context.Products
@@ -51,6 +51,11 @@ namespace LaptopShop.Controllers
             if (categoryIds != null && categoryIds.Any())
             {
                 products = products.Where(p => categoryIds.Contains(p.Product.CategoryId));
+            }
+
+            if (maxPrice != null)
+            {
+                products = products.Where(p => p.FinalPrice <= maxPrice);
             }
 
             // Lọc theo nhu cầu sử dụng
