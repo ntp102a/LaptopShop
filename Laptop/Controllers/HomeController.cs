@@ -1,5 +1,6 @@
 ﻿using LaptopShop.Models;
 using LaptopShop.ModelViews;
+using LaptopShop.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.ML;
@@ -12,11 +13,13 @@ namespace LaptopShop.Controllers
     {
         public readonly laptopWebContext _context;
         //private readonly RecommendationService _recommendationService;
-
-        public HomeController( laptopWebContext context)
+        private ProductRecommendationService _recommendationService;
+        public HomeController(laptopWebContext context)
         {
             _context = context;
             //_recommendationService = new RecommendationService();
+            _recommendationService = new ProductRecommendationService(_context);
+            _recommendationService.TrainModel();
         }
 
         public IActionResult Index()
@@ -52,37 +55,20 @@ namespace LaptopShop.Controllers
                 .Take(12)
                 .ToList();
 
-            //var taikhoanID = HttpContext.Session.GetString("UserId");
-            //if (taikhoanID != null)
-            //{
-            //    var recommendations = _recommendationService.RecommendForUser(taikhoanID);
+            var taikhoanID = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            if (taikhoanID != null)
+            {
+                var recommendations = _recommendationService.GetHybridRecommendations(taikhoanID);
+                var filteredRecommendations = recommendations.Where(item => item.PredictedRating > 0.5).ToList();
 
-            //    List<Product> recomProducts = new List<Product>();
+                var productIds = filteredRecommendations.Select(r => r.ProductId).ToList();
 
-            //    foreach (var recommendation in recommendations)
-            //    {
-            //        var product = _context.Products
-            //            .Include(p => p.Image)
-            //            .Include(p => p.Category)
-            //            .FirstOrDefault(p => p.ProductId == recommendation.ProductId);
-            //        if (product != null)
-            //        {
-            //            var lsProduct = _context.Products.AsNoTracking()
-            //                .Include(p => p.Image)
-            //                .Include(p => p.Category)
-            //                .Where(x => x.CategoryId == product.CategoryId && x.ProductName != product.ProductName)
-            //                .OrderByDescending(x => x.Price)
-            //                .ToList();
-            //            foreach (var pro in lsProduct)
-            //            {
-            //                recomProducts.Add(pro);
-            //            }
-            //        }
-            //    }
-
-            //    ViewBag.RecommendProducts = recomProducts;
-
-            //}
+                var listProduct = _context.Products
+                    .Include(p => p.Image)
+                    .Where(p => productIds.Contains(p.ProductId) && p.IsPublic == true)
+                    .ToList();
+                ViewBag.RecommendProduct = listProduct;
+            }
 
             ViewBag.TopProducts = productCounts;
             ViewBag.AllProducts = lsProducts;

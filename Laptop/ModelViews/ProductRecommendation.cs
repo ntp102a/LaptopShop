@@ -1,8 +1,20 @@
 ﻿namespace LaptopShop.ModelViews
 {
-    public class ProductRecommendation
+    public class ProductData
     {
-        public uint ProductId { get; set; }
+        public string UserId { get; set; }
+        public int ProductId { get; set; }
+        public float Rating { get; set; }
+    }
+
+    public class ProductPrediction
+    {
+        public float Label { get; set; }
         public float Score { get; set; }
+    }
+    public class Recommendation
+    {
+        public int ProductId { get; set; }
+        public float PredictedRating { get; set; }
     }
 }

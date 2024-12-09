@@ -1,5 +1,6 @@
 ﻿@model LaptopShop.ModelViews.HomeViewVM
 @inject laptopWebContext _context
+@using LaptopShop.ModelViews;
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.EntityFrameworkCore.Query
 
@@ -9,7 +10,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     List<Product> allProducts = ViewBag.AllProducts;
     List<Product> gameProducts = ViewBag.GameProducts;
-    //List<Product> recomProducts = ViewBag.RecommendProducts;
+    List<Product> recommendProducts = ViewBag.RecommendProduct;
     List<int> productIds = ViewBag.TopProducts;
     List<Product> topProducts = _context.Products
         .AsNoTracking()
@@ -19,45 +20,91 @@
 
 }
 
-<!-- SECTION NEW PRODUCT -->
-<div class="section">
-    <!-- container -->
-    <div class="container">
-        <!-- row -->
-        <div class="row">
-            <!-- section title -->
-            <div class="col-md-12">
-                <div class="section-title">
-                    <h3 class="title">TẤT CẢ SẢN PHẨM</h3>
-                    <div class="section-nav">
-                        <ul class="section-tab-nav tab-nav">
-                            <li class="active"><a href="/tat-ca-san-pham">Xem thêm</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- /section title -->
-            <!-- Products tab & slick -->
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="products-tabs">
-                        <!-- tab -->
-                        <div id="tab1" class="active">
-                            <div class="row">
-                                @await Html.PartialAsync("_ListProductPartialView", allProducts)
-                            </div>
+@if (User.Identity.IsAuthenticated)
+{
+    <!-- SECTION ALL PRODUCT -->
+    <div class="section">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <!-- section title -->
+                <div class="col-md-12">
+                    <div class="section-title">
+                        <h3 class="title">Có thể bạn sẽ thích</h3>
+                        <div class="section-nav">
+                            <ul class="section-tab-nav tab-nav">
+                                <li class="active"><a href="/tat-ca-san-pham">Xem tất cả sản phẩm</a></li>
+                            </ul>
                         </div>
-                        <!-- /tab -->
                     </div>
                 </div>
+                <!-- /section title -->
+                <!-- Products tab & slick -->
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="products-tabs">
+                            <!-- tab -->
+                            <div id="tab1" class="active">
+                                <div class="row">
+                                    @await Html.PartialAsync("_ListProductPartialView", recommendProducts)
+                                </div>
+                            </div>
+                            <!-- /tab -->
+                        </div>
+                    </div>
+                </div>
+                <!-- Products tab & slick -->
             </div>
-            <!-- Products tab & slick -->
+            <!-- /row -->
         </div>
-        <!-- /row -->
+        <!-- /container -->
     </div>
-    <!-- /container -->
-</div>
-<!-- END SECTION NEW PRODUCT -->
+    <!-- END SECTION ALL PRODUCT -->
+}
+else
+{
+    <!-- SECTION ALL PRODUCT -->
+    <div class="section">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <!-- section title -->
+                <div class="col-md-12">
+                    <div class="section-title">
+                        <h3 class="title">TẤT CẢ SẢN PHẨM</h3>
+                        <div class="section-nav">
+                            <ul class="section-tab-nav tab-nav">
+                                <li class="active"><a href="/tat-ca-san-pham">Xem thêm</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- /section title -->
+                <!-- Products tab & slick -->
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="products-tabs">
+                            <!-- tab -->
+                            <div id="tab1" class="active">
+                                <div class="row">
+                                    @await Html.PartialAsync("_ListProductPartialView", allProducts)
+                                </div>
+                            </div>
+                            <!-- /tab -->
+                        </div>
+                    </div>
+                </div>
+                <!-- Products tab & slick -->
+            </div>
+            <!-- /row -->
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- END SECTION ALL PRODUCT -->
+}
+
 
 <!-- SECTION TOP SELLING -->
 <div class="section">
@@ -100,8 +147,6 @@
     <!-- /container -->
 </div>
 <!-- END SECTION TOP SELLING -->
-
-
 <!-- SECTION GAME PRODUCT -->
 <div class="section">
     <!-- container -->
@@ -143,6 +188,7 @@
     <!-- /container -->
 </div>
 <!-- END SECTION TOP SELLING -->
+
 
 <style>
     .section-title {

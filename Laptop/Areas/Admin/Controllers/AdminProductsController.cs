@@ -161,12 +161,12 @@ namespace LaptopShop.Areas.Admin.Controllers
             product.InfoId = information.InfoId;
             product.ImageId = image.ImageId;
 
+            product.IsPublic = true;
+
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
             _notyfService.Success("Thêm mới thành công");
             return RedirectToAction(nameof(Index));
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
-            return View(product);
         }
 
         // GET: Admin/AdminProducts/Edit/5
