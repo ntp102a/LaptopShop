@@ -144,7 +144,7 @@ namespace LaptopShop.Helpper
                 string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", sDirectory);
                 CreateIfMissing(path);
                 string pathFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", sDirectory, newname);
-                var supportedTypes = new[] { "jpg", "jpeg", "png", "gif" };
+                var supportedTypes = new[] { "jpg", "jpeg", "png", "gif", "webp" };
                 var fileExt = System.IO.Path.GetExtension(file.FileName).Substring(1);
                 if (!supportedTypes.Contains(fileExt.ToLower())) /// Khác các file định nghĩa
                 {
