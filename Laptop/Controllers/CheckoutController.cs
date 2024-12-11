@@ -108,7 +108,7 @@ namespace LaptopShop.Controllers
                     return View(model);
                 }
 
-                return RedirectToAction("Login", "Account"); // Chuyển hướng đến trang đăng nhập nếu không có tài khoản
+                return RedirectToAction("Login", "Accounts");
             }
             catch (Exception ex)
             {
@@ -132,7 +132,7 @@ namespace LaptopShop.Controllers
                 TempData["Email"] = muahang.Email;
 
                 string paymentMethod = Request.Form["PaymentMethod"];
-                if(paymentMethod == "VnPay")
+                if (paymentMethod == "VnPay")
                 {
                     var total = 0.0;
                     foreach (var item in GioHang)
@@ -180,7 +180,8 @@ namespace LaptopShop.Controllers
                         Phone = muahang.Phone,
                         OrderDate = DateTime.Now,
                         Note = muahang.Note,
-                        StatusId = 6,
+                        StatusId = 1,
+                        IsPayment = false,
                         Total = Convert.ToInt32(cart.Sum(x => x.TotalMoney))
                     };
 
@@ -213,7 +214,7 @@ namespace LaptopShop.Controllers
                     return RedirectToAction("Success");
                 }
 
-                return RedirectToAction("Login", "Account"); // Chuyển hướng đến trang đăng nhập nếu không có tài khoản
+                return RedirectToAction("Login", "Accounts");
             }
             catch (Exception ex)
             {
@@ -269,7 +270,8 @@ namespace LaptopShop.Controllers
                     Phone = TempData["Phone"]?.ToString(),
                     OrderDate = DateTime.Now,
                     Note = TempData["Note"]?.ToString(),
-                    StatusId = 4,
+                    StatusId = 1,
+                    IsPayment = true,
                     Total = Convert.ToInt32(cart.Sum(x => x.TotalMoney))
                 };
 
@@ -522,7 +524,8 @@ namespace LaptopShop.Controllers
                             Phone = khachhang?.Phone,
                             RecipientName = khachhang.FullName,
                             OrderDate = DateTime.Now,
-                            StatusId = 4,
+                            StatusId = 1,
+                            IsPayment = true,
                             Total = Convert.ToInt32(cartItems.Sum(x => x.TotalMoney))
                         };
 

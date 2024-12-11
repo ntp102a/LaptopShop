@@ -9,7 +9,7 @@
     <div class="header-sub-title">
         <nav class="breadcrumb breadcrumb-dash">
             <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Home</a>
-            <a class="breadcrumb-item" asp-area="Admin" asp-controller="AdminOrders" asp-action="Index">Danh sách đơn hàng</a>
+            <a class="breadcrumb-item" asp-area="Admin" asp-controller="AdminOrders" asp-action="Index" asp-route-id="@ViewBag.ClassifyId">Danh sách đơn hàng</a>
             <span class="breadcrumb-item active">Chi tiết hoá đơn</span>
         </nav>
     </div>
@@ -22,7 +22,7 @@
                 <div class="row m-t-20 lh-2">
                     <div class="col-sm-6">
                         <h3 class="p-l-10 m-t-10">Hoá đơn</h3>
-                        <address class="p-l-10 m-t-10">                            
+                        <address class="p-l-10 m-t-10">
                             <strong class="text-dark" title="">Tên người nhận: <br /></strong>
                             <span> @Model.User.FullName</span><br />
                             <strong class="text-dark" title="">Địa chỉ giao hàng: <br /></strong>
@@ -48,6 +48,18 @@
                         <div class="text-dark text-uppercase d-inline-block">
                             <span class="font-weight-semibold text-dark">Trạng thái: </span>
                             <div class="float-right"> @Model.Status.Status</div>
+                        </div>
+                        <br />
+                        <div class="text-dark text-uppercase d-inline-block">
+                            <span class="font-weight-semibold text-dark">Thanh toán: </span>
+                            @if (Model.IsPayment == true)
+                            {
+                                <div class="float-right"> Đã thanh toán</div>
+                            }
+                            else
+                            {
+                                <div class="float-right"> Chưa thanh toán</div>
+                            }
                         </div>
                     </div>
                 </div>

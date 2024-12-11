@@ -171,6 +171,7 @@ namespace LaptopShop.Models
                     .HasColumnName("recipient_name");
 
                 entity.Property(e => e.StatusId).HasColumnName("statusId");
+                entity.Property(e => e.IsPayment).HasColumnName("is_payment");
 
                 entity.Property(e => e.Total).HasColumnName("total");
 
@@ -327,7 +328,7 @@ namespace LaptopShop.Models
                 entity.Property(e => e.IsVerified).HasColumnName("is_verified");
 
                 entity.Property(e => e.Salt)
-                    .HasMaxLength(8)
+                    .HasMaxLength(5)
                     .IsFixedLength();
 
                 entity.HasOne(d => d.Role)

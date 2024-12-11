@@ -16,7 +16,6 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace LaptopShop.Controllers
 {
-    [Authorize]
     public class AccountsController : Controller
     {
         private readonly laptopWebContext _context;
@@ -82,25 +81,193 @@ namespace LaptopShop.Controllers
         [Route("/tai-khoan-cua-toi", Name = "Dashboard")]
         public IActionResult Dashboard()
         {
+            var accountID = User?.Identity?.GetAccountID();
+            if (accountID != null)
+            {
+                var user = _context.Users.FirstOrDefault(p => p.UserId == accountID);
+                return View(user);
+            }
+
+            return RedirectToAction("Login");
+        }
+        [HttpGet]
+        public IActionResult GetDashboardInfo(string title, int orderId)
+        {
             var taikhoanID = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
             if (taikhoanID != null)
             {
-                var khachhang = _context.Users
-                    .AsNoTracking()
-                    .SingleOrDefault(x => x.UserId == taikhoanID);
-                if (khachhang != null)
+                switch (title)
                 {
-                    var lsDonhang = _context.Orders
-                        .Include(x => x.Status)
-                        .AsNoTracking()
-                        .Where(x => x.UserId == khachhang.UserId)
-                        .OrderByDescending(x => x.OrderDate).ToList();
-                    ViewBag.Donhang = lsDonhang;
-                    return View(khachhang);
+                    case "Thông tin tài khoản":
+                        var khachhang = _context.Users.AsNoTracking().SingleOrDefault(x => x.UserId == taikhoanID);
+                        return PartialView("_InformationPartialView", khachhang);
+                    case "Danh sách đơn hàng":
+                        var listOrder = _context.Orders
+                         .Include(x => x.Status)
+                         .AsNoTracking()
+                         .Where(x => x.UserId == taikhoanID)
+                         .OrderByDescending(x => x.OrderDate).ToList();
+                        return PartialView("_DonhangPartialView", listOrder);
+                    case "Thay đổi thông tin":
+                        var userInfo = _context.Users
+                            .AsNoTracking()
+                            .FirstOrDefault(x => x.UserId == taikhoanID);
+
+                        if (userInfo == null)
+                        {
+                            return BadRequest("Không tìm thấy dữ liệu phù hợp.");
+                        }
+                        else
+                        {
+                            var modelView = new ChangeInfoViewModel
+                            {
+                                FullName = userInfo.FullName,
+                                Address = userInfo.Address,
+                                Phone = userInfo.Phone
+                            };
+                            return PartialView("_ChangeInfoPartialView", modelView);
+                        }
+                    case "Đổi mật khẩu":
+                        return PartialView("_ChangePasswordPartialView");
+                    case "Xem chi tiết":
+                        var orderDetail = _context.Orders.Include(x => x.Status).Include(x => x.User).Include(x => x.OrderDetails).ThenInclude(x => x.Product).FirstOrDefault(x => x.OrderId == orderId);
+                        return PartialView("_OrderDetailsPartialView", orderDetail);
+                    default:
+                        return BadRequest("Không tìm thấy dữ liệu phù hợp.");
                 }
             }
-            return RedirectToAction("Login");
+            return View();
         }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult ChangeInfo(ChangeInfoViewModel model)
+        {
+            var accountID = User?.Identity?.GetAccountID();
+            if (string.IsNullOrEmpty(accountID))
+            {
+                return RedirectToAction("Login");
+            }
+
+            var user = _context.Users.FirstOrDefault(p => p.UserId == accountID);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.Phone) && model.Phone != user.Phone)
+            {
+                var checkPhone = _context.Users.FirstOrDefault(x => x.Phone.ToLower() == model.Phone.ToLower());
+                if (checkPhone != null)
+                {
+                    _notyfService.Error("Số điện thoại đã tồn tại");
+                    return RedirectToAction("Dashboard", "Accounts");
+                }
+            }
+
+            user.FullName = model.FullName;
+            user.Address = model.Address;
+            user.Phone = model.Phone;
+
+            _context.Update(user);
+            try
+            {
+                _context.SaveChanges();
+                _notyfService.Success("Thay đổi thông tin thành công");
+                return RedirectToAction("Dashboard", "Accounts");
+            }
+            catch
+            {
+                _notyfService.Error("Thay đổi không thành công");
+                return RedirectToAction("Dashboard", "Accounts");
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userId = User?.Identity?.GetAccountID();
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login");
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                _notyfService.Error("Không tìm thấy học viên");
+                return RedirectToAction("Dashboard");
+            }
+
+            // Kiểm tra mật khẩu cũ
+            var currentPasswordHash = (model.OldPassword + user.Salt).ToMD5();
+            if (user.Password != currentPasswordHash)
+            {
+                _notyfService.Success("Sai mật khẩu");
+                return RedirectToAction("Dashboard");
+            }
+
+            // Cập nhật mật khẩu mới
+            string newSalt = Utilities.GetRandomKey();
+            user.Salt = newSalt;
+            user.Password = (model.NewPassword + newSalt).ToMD5();
+
+            try
+            {
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+                _notyfService.Success("Đổi mật khẩu thành công.");
+            }
+            catch (Exception)
+            {
+                _notyfService.Error("Có lỗi xảy ra khi đổi mật khẩu.");
+            }
+
+            return RedirectToAction("Dashboard");
+        }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult CancelOrder(int orderId)
+        {
+            try
+            {
+                var accountId = User?.Identity?.GetAccountID();
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return RedirectToAction("Login");
+                }
+
+                // Lấy thông tin đơn hàng theo orderId
+                var order = _context.Orders.FirstOrDefault(o => o.OrderId == orderId && o.UserId == accountId);
+                if (order == null)
+                {
+                    _notyfService.Error("Đơn hàng không tồn tại hoặc bạn không có quyền hủy đơn này.");
+                    return RedirectToAction("Dashboard");
+                }
+
+                // Cập nhật trạng thái đơn hàng
+                order.StatusId = 4;
+                _context.Update(order);
+                _context.SaveChanges();
+
+                _notyfService.Success("Đơn hàng đã được hủy thành công.");
+
+                return RedirectToAction("GetDashboardInfo", new {title = "Danh sách đơn hàng" });
+            }
+            catch (Exception ex)
+            {
+                _notyfService.Error("Đã có lỗi xảy ra khi hủy đơn hàng.");
+                return RedirectToAction("Dashboard");
+            }
+        }
+
         [HttpGet]
         [AllowAnonymous]
         [Route("/dang-ky", Name = "DangKy")]
@@ -217,7 +384,7 @@ namespace LaptopShop.Controllers
             }
             if (VerifyCode(email, code))
             {
-                
+
                 var taikhoan = _context.Users.FirstOrDefault(p => p.Email == email);
                 if (taikhoan == null)
                 {
@@ -372,90 +539,5 @@ namespace LaptopShop.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize]
-        [HttpPost]
-        public IActionResult ChangePassword(ChangePasswordViewModel model)
-        {
-            try
-            {
-                var taikhoanID = HttpContext.Session.GetString("UserId");
-                if (taikhoanID == null)
-                {
-                    return RedirectToAction("Login", "Accounts");
-                }
-                var taikhoan = _context.Users.Find(Convert.ToInt32(taikhoanID));
-                if (taikhoan == null) return RedirectToAction("Login", "Accounts");
-                if (model.PasswordNew.Length < 5)
-                {
-                    _notyfService.Error("Vui lòng nhập tối tiểu 5 ký tự");
-                    return RedirectToAction("Dashboard", "Accounts");
-                }
-                else
-                {
-                    if (model.PasswordNew != model.ConfirmPasswordNew)
-                    {
-                        _notyfService.Error("Mật khẩu mới không trùng khớp");
-                        return RedirectToAction("Dashboard", "Accounts");
-                    }
-                    var pass = (model.PasswordNow.Trim() + taikhoan.Salt.Trim()).ToMD5();
-                    if (pass == taikhoan.Password)
-                    {
-                        string passNew = (model.PasswordNew.Trim() + taikhoan.Salt.Trim()).ToMD5();
-                        taikhoan.Password = passNew;
-                        _context.Update(taikhoan);
-                        _context.SaveChanges();
-                        _notyfService.Success("Thay đổi mật khẩu thành công");
-                        return RedirectToAction("Dashboard", "Accounts");
-                    }
-                    else
-                    {
-                        _notyfService.Error("Sai mật khẩu");
-                        return RedirectToAction("Dashboard", "Accounts");
-                    }
-                }
-            }
-            catch
-            {
-                _notyfService.Error("Thay đổi mật khẩu không thành công");
-                return RedirectToAction("Dashboard", "Accounts");
-            }
-        }
-        [Authorize]
-        [HttpPost]
-        public IActionResult ChangeInfo(ChangeInfoViewModel model)
-        {
-            try
-            {
-                var accountID = User.Identity.GetAccountID();
-
-                if (!string.IsNullOrEmpty(accountID))
-                {
-                    var existingUser = _context.Users.SingleOrDefault(x => x.Phone.ToLower() == model.Phone.ToLower());
-                    if (existingUser != null)
-                    {
-                        ModelState.AddModelError("Phone", "Số điện thoại đã tồn tại");
-                        _notyfService.Success("Số điện thoại đã tồn tại");
-                        return RedirectToAction("Dashboard", "Accounts");
-                    }
-                    var user = _context.Users.SingleOrDefault(x => x.UserId == accountID);
-                    if (model != null)
-                    {
-                        user.FullName = model.FullName;
-                        user.Address = model.Address;
-                        user.Phone = model.Phone;
-                        _context.Update(user);
-                        _context.SaveChanges();
-                        _notyfService.Success("Thay đổi thành công");
-                        return RedirectToAction("Dashboard", "Accounts");
-                    }
-                }
-                return RedirectToAction("Dashboard", "Accounts");
-            }
-            catch
-            {
-                _notyfService.Error("Thay đổi không thành công");
-                return RedirectToAction("Dashboard", "Accounts");
-            }
-        }
     }
 }

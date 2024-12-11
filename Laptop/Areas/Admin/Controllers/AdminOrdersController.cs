@@ -25,21 +25,59 @@ namespace LaptopShop.Areas.Admin.Controllers
             _notyfService = notyfService;
         }
 
-        // GET: Admin/AdminOrders
-        public IActionResult Index(int? page)
+        public IActionResult Index(int? page, string id)
         {
-            var pageNumber = page == null || page <= 0 ? 1 : page.Value;
+            var pageNumber = page ?? 1;
             var pageSize = 20;
-            var IsOrders = _context.Orders.Include(o => o.User).Include(o => o.Status)
-                .AsNoTracking()
-                .OrderByDescending(x => x.OrderDate);
-            PagedList<Order> models = new PagedList<Order>(IsOrders, pageNumber, pageSize);
+
+            IQueryable<Order> lsOrders;
+
+            switch (id)
+            {
+                case "1":
+                    lsOrders = _context.Orders
+                        .Include(o => o.User)
+                        .Include(o => o.Status)
+                        .AsNoTracking()
+                        .Where(p => (p.StatusId == 1 || p.StatusId == 2 || (p.StatusId == 3 && p.IsPayment == false)))
+                        .OrderByDescending(x => x.OrderDate);
+                    break;
+
+                case "2":
+                    lsOrders = _context.Orders
+                        .Include(o => o.User)
+                        .Include(o => o.Status)
+                        .AsNoTracking()
+                        .Where(p => p.StatusId == 3 && p.IsPayment == true)
+                        .OrderByDescending(x => x.OrderDate);
+                    break;
+
+                case "3":
+                    lsOrders = _context.Orders
+                        .Include(o => o.User)
+                        .Include(o => o.Status)
+                        .AsNoTracking()
+                        .Where(p => p.StatusId == 4)
+                        .OrderByDescending(x => x.OrderDate);
+                    break;
+
+                default:
+                    lsOrders = _context.Orders
+                        .Include(o => o.User)
+                        .Include(o => o.Status)
+                        .AsNoTracking()
+                        .OrderByDescending(x => x.OrderDate);
+                    break;
+            }
+
+            PagedList<Order> models = new PagedList<Order>(lsOrders, pageNumber, pageSize);
             ViewBag.CurrentPage = pageNumber;
+            ViewBag.ClassifyId = id;
             return View(models);
         }
 
         // GET: Admin/AdminOrders/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, string classifyId)
         {
             if (id == null || _context.Orders == null)
             {
@@ -66,6 +104,7 @@ namespace LaptopShop.Areas.Admin.Controllers
 
             var fullAddress = $"{order.Address}";
             ViewBag.fullAddress = fullAddress;
+            ViewBag.ClassifyId = classifyId;
             return View(order);
         }
 
@@ -86,7 +125,14 @@ namespace LaptopShop.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["TrangThai"] = new SelectList(_context.TransactStatuses, "StatusId", "Status", order.StatusId);
+
+            // Lọc danh sách trạng thái dựa trên StatusId hiện tại
+            var allowedStatuses = _context.TransactStatuses.Where(s =>
+                (order.StatusId == 1 && (s.StatusId == 2 || s.StatusId == 3 || s.StatusId == 4)) ||
+                (order.StatusId == 2 && (s.StatusId == 3 || s.StatusId == 4))
+            );
+
+            ViewData["TrangThai"] = new SelectList(allowedStatuses, "StatusId", "Status");
             return PartialView("ChangeStatus", order);
         }
 
@@ -128,10 +174,28 @@ namespace LaptopShop.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { id = "1" });
             }
             ViewData["TrangThai"] = new SelectList(_context.TransactStatuses, "StatusId", "Status", order.StatusId);
             return PartialView("ChangStatus", order);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePayment(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                order.IsPayment = true;
+                _context.Orders.Update(order);
+                await _context.SaveChangesAsync();
+                _notyfService.Success("Cập nhật thành công");
+            }
+            return RedirectToAction("Index", new { id = "1" });
         }
 
         // GET: Admin/AdminOrders/Create
@@ -162,7 +226,7 @@ namespace LaptopShop.Areas.Admin.Controllers
         }
 
         // GET: Admin/AdminOrders/Edit/5
-        public async Task<IActionResult> Edit(int? id, OrderViewModel model)
+        public async Task<IActionResult> Edit(int? id, OrderViewModel model, string classifyId)
         {
             if (id == null || _context.Orders == null)
             {
@@ -186,6 +250,7 @@ namespace LaptopShop.Areas.Admin.Controllers
                 model.UserId = order.UserId;
                 model.StatusId = order.StatusId;
             }
+            ViewBag.ClassifyId = classifyId;
             ViewData["StatusId"] = new SelectList(_context.TransactStatuses, "StatusId", "Status", model.StatusId);
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "FullName", model.UserId);
             return View(model);
@@ -196,7 +261,7 @@ namespace LaptopShop.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, OrderViewModel model)
+        public async Task<IActionResult> Edit(int id, OrderViewModel model, string classifyId)
         {
             if (id != model.OrderId)
             {
@@ -234,13 +299,13 @@ namespace LaptopShop.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new {id = classifyId});
             }
             return View(model);
         }
 
         // GET: Admin/AdminOrders/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, string classifyId)
         {
             if (id == null || _context.Orders == null)
             {
@@ -255,13 +320,14 @@ namespace LaptopShop.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+            ViewBag.ClassifyId = classifyId;
             return View(order);
         }
 
         // POST: Admin/AdminOrders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id, string classifyId)
         {
             if (_context.Orders == null)
             {
@@ -273,11 +339,11 @@ namespace LaptopShop.Areas.Admin.Controllers
                 var orderDetail = _context.OrderDetails.Where(x => x.OrderId == id).ToList();
                 if (orderDetail != null)
                 {
-                    foreach(var item in orderDetail)
+                    foreach (var item in orderDetail)
                     {
                         _context.OrderDetails.Remove(item);
-                    }    
-                    
+                    }
+
                     _context.SaveChanges();
                 }
                 _context.Orders.Remove(order);
@@ -286,7 +352,7 @@ namespace LaptopShop.Areas.Admin.Controllers
 
             await _context.SaveChangesAsync();
             _notyfService.Success("Xoá thành công");
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new {id = classifyId});
         }
 
         private bool OrderExists(int id)

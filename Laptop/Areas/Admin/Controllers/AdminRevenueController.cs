@@ -26,7 +26,7 @@ namespace LaptopShop.Areas.Admin.Controllers
         public IActionResult Index()
         {
             var totalMoney = _context.Orders
-                .Where(o => o.StatusId == 2 || o.StatusId == 5 || o.StatusId == 4)
+                .Where(o => o.IsPayment == true)
                 .Sum(o => o.Total);
 
             var totalOrders = _context.Orders.Count();
@@ -56,7 +56,7 @@ namespace LaptopShop.Areas.Admin.Controllers
             int[] dailyDataArray = new int[DateTime.DaysInMonth(year, month)];
 
             var orderData = _context.Orders
-                .Where(o => o.StatusId == 2 || o.StatusId == 5 || o.StatusId == 4)
+                .Where(o => o.IsPayment == true)
                 .Where(o => o.OrderDate.HasValue &&
                             o.OrderDate.Value.Year == year &&
                             o.OrderDate.Value.Month == month)
@@ -77,7 +77,7 @@ namespace LaptopShop.Areas.Admin.Controllers
 
             // Tổng doanh thu của năm
             int totalRevenueInYear = _context.Orders
-                            .Where(o => o.StatusId == 2 || o.StatusId == 5)
+                            .Where(o => o.IsPayment == true)
                             .Where(o => o.OrderDate.HasValue && o.OrderDate.Value.Year == year)
                             .Sum(o => o.Total) ?? 0;
 
@@ -93,7 +93,7 @@ namespace LaptopShop.Areas.Admin.Controllers
             for (int i = 1; i <= 12; i++)
             {
                 var monthlyTotal = _context.Orders
-                    .Where(o => o.StatusId == 2 || o.StatusId == 5)
+                    .Where(o => o.IsPayment == true)
                     .Where(o => o.OrderDate.HasValue &&
                                 o.OrderDate.Value.Year == year &&
                                 o.OrderDate.Value.Month == i)
@@ -125,7 +125,7 @@ namespace LaptopShop.Areas.Admin.Controllers
                     monthlyRevenue[month] = 0; // Default revenue is 0
                 }
                 var monthlyDatalist = _context.Orders
-                    .Where(o => o.StatusId == 2 || o.StatusId == 5) // Filter by status
+                    .Where(o => o.IsPayment == true) // Filter by status
                     .Where(o => o.OrderDate.HasValue && o.OrderDate.Value.Year == year)
                     .GroupBy(o => o.OrderDate.Value.Month)
                     .Select(g => new

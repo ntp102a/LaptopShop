@@ -18,44 +18,10 @@
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover e-commerce-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>ĐƠN HÀNG</th>
-                        <th>NGÀY MUA</th>
-                        <th>TỔNG TIỀN</th>
-                        <th>TRẠNG THÁI</th>
-                        <th>#</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null)
-                    {
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@item.OrderId</td>
-                                <td>@item.User.FullName</td>
-                                <td>@item.OrderDate</td>
-                                <td>@item.Total.Value.ToString("#,##0") VND</td>
-                                <td>@item.Status.Status</td>
-                                <td>
-                                    <a class="btn btn-primary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Details" asp-route-id="@item.OrderId">View</a>
-                                    <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Edit" asp-route-id="@item.OrderId">Edit</a>
-                                    <a class="btn btn-success btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Delete" asp-route-id="@item.OrderId">Delete</a>
-                                    <a data-target="#modal-header" data-toggle="modal" class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="ChangeStatus" asp-route-id="@item.OrderId">Cập nhật trạng thái</a>
-
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+            @await Html.PartialAsync("_ListOrderPartialView", Model.ToList())
             <div aria-label="Page navigation example">
                 <ul class="pagination">
-                    <pager class="page-container" list="@Model" asp-area="Admin" asp-controller="AdminOrders" asp-action="Index" />
+                    <pager class="page-container" list="@Model" asp-area="Admin" asp-controller="AdminOrders" asp-action="Index" asp-route-id="@ViewBag.ClassifyId" />
                 </ul>
             </div>
         </div>
@@ -65,19 +31,17 @@
 <div id="modal-header" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-
         </div>
     </div>
 </div>
 @section Scripts {
-        <script>
-            $('#modal-header').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // Button that triggered the modal
-                var url = button.attr("href");
-                var modal = $(this);
-                // note that this will replace the content of modal-content ever time the modal is opened
-                modal.find('.modal-content').load(url);
-            });
-        </script>
-
+    <script>
+        $('#modal-header').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var url = button.attr("href");
+            var modal = $(this);
+            // note that this will replace the content of modal-content ever time the modal is opened
+            modal.find('.modal-content').load(url);
+        });
+    </script>
 }
