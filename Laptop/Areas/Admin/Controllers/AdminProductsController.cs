@@ -246,8 +246,8 @@ namespace LaptopShop.Areas.Admin.Controllers
                 if (!string.IsNullOrEmpty(image.ImageThumb) && !string.IsNullOrEmpty(image.Image1) && !string.IsNullOrEmpty(image.Image2) && !string.IsNullOrEmpty(image.Image3))
                 {
                     _context.Images.Update(image);
-                }    
-                
+                }
+                product.IsPublic = true;
                 _context.Products.Update(product);
                 await _context.SaveChangesAsync();
 
