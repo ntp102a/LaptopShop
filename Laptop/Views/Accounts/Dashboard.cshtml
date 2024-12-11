@@ -3,96 +3,111 @@
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    List<Order> DanhSachDonHang = ViewBag.Donhang;
-    LaptopShop.ModelViews.ChangeInfoViewModel changeInfo = new LaptopShop.ModelViews.ChangeInfoViewModel();
-    LaptopShop.ModelViews.ChangePasswordViewModel changePassword = new LaptopShop.ModelViews.ChangePasswordViewModel();
 }
-
-<div class="nav-item">
-    <p></p>
-    <main class="main-content">
-        <div class="account-page-area section-space-y-axis-10">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-3">
-                        <ul class="nav myaccount-tab-trigger" id="account-page-tab" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="account-dashboard-tab" data-bs-toggle="tab" href="#account-dashboard" role="tab" aria-controls="account-dashboard" aria-selected="true">Thông tin tài khoản</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="account-orders-tab" data-bs-toggle="tab" href="#account-orders" role="tab" aria-controls="account-orders" aria-selected="false">Danh sách đơn hàng</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="account-details-tab" data-bs-toggle="tab" href="#account-details" role="tab" aria-controls="account-details" aria-selected="false">Thay đổi mật khẩu</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="info-details-tab" data-bs-toggle="tab" href="#info-details" role="tab" aria-controls="info-details" aria-selected="false">Thay đổi thông tin</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="account-logout-tab" href="/dang-xuat" role="tab" aria-selected="false">Đăng xuất</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-lg-9">
-                        <div class="tab-content myaccount-tab-content" id="account-page-tab-content">
-                            <div class="tab-pane fade show active " id="account-dashboard" role="tabpanel" aria-labelledby="account-dashboard-tab">
-                                <div class="myaccount-dashboard">
-                                    <p>
-                                        Xin chào, <b>@Model.FullName</b>
-                                    </p>
-                                    <p>Email: @Model.Email</p>
-                                    <p>Số điện thoại: @Model.Phone</p>
-                                    <p>Địa chỉ: @Model.Address</p>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="account-orders" role="tabpanel" aria-labelledby="account-orders-tab">
-                                <div class="myaccount-orders">
-                                    <h4 class="small-title">DANH SÁCH ĐƠN HÀNG</h4>
-                                    @await Html.PartialAsync("_DonhangPartialView", DanhSachDonHang)
-                                    
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="info-details" role="tabpanel" aria-labelledby="info-details-tab">
-                                @await Html.PartialAsync("_ChangeInfoPartialView", changeInfo)
-                            </div>
-                            <div class="tab-pane fade" id="account-details" role="tabpanel" aria-labelledby="account-details-tab">
-                                @await Html.PartialAsync("_ChangePasswordPartialView", changePassword)
-                            </div>
-                        </div>
-                    </div>
+<section>
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Menu -->
+            <div class="col-md-3">
+                <div class="menu">
+                    <a data-name="Thông tin tài khoản" class="active" onclick="setActive(this)"> Thông tin tài khoản</a>
+                    <a data-name="Danh sách đơn hàng" onclick="setActive(this)"> Danh sách đơn hàng</a>
+                    <a data-name="Thay đổi thông tin" onclick="setActive(this)"> Thay đổi thông tin</a>
+                    <a data-name="Đổi mật khẩu" onclick="setActive(this)"> Đổi mật khẩu</a>
+                    <a href="/dang-xuat"> Đăng xuất</a>
                 </div>
             </div>
+
+            <div class="col-md-9">
+                @await Html.PartialAsync("_InformationPartialView", Model)
+            </div>
         </div>
-    </main>    
-</div>
+    </div>
+</section>
 
-@*@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $(".xemdonhang").click(function () {
-                var productid = $(this).attr("data-madonhang");
-                $.ajax({
-                    url: '/DonHang/Details',
-                    type: "POST",
-                    dataType: "JSON",
-                    data: {
-                        id: madonhang
-                    },
-                    async: true,
-                    success: function (results) {
-                        if (result.success) {
-                            $("#records_table").html("");
-                            $("#records_table").html(results);
-                        }
-                    },
-                    error: function (rhs) {
-                        alert("Lỗi");
-                    }
-                });
-            });
+<style>
+    .menu {
+        background-color: #96919138;
+        color: white;
+        padding: 15px;
+        height: 100%;
+        border-radius: 5px;
+    }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #000;
+            text-align: center;
+        }
+
+            .menu a:hover {
+                background-color: #D10024;
+                cursor: pointer;
+            }
+
+            .menu a.active {
+                background-color: #D10024;
+                color: white;
+                font-weight: bold;
+            }
+</style>
+
+<script>
+    function setActive(element) {
+        document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
+        element.classList.add('active');
+
+        const name = element.getAttribute('data-name');
+
+        $.ajax({
+            url: '/Accounts/GetDashboardInfo',
+            type: 'GET',
+            data: { title: name },
+            success: function (data) {
+                $('.col-md-9').html(data);
+            },
+            error: function () {
+                alert('Có lỗi xảy ra khi tải dữ liệu.');
+            }
         });
-    </script>
-}*@
+    }
 
+    function setDirect(element) {
+        
+        const name = element.getAttribute('data-name');
+        const id = element.getAttribute('data-id');
 
+        $.ajax({
+            url: '/Accounts/GetDashboardInfo',
+            type: 'GET',
+            data: { title: name, orderId: id },
+            success: function (data) {
+                $('.col-md-9').html(data);
+            },
+            error: function () {
+                alert('Có lỗi xảy ra khi tải dữ liệu.');
+            }
+        });
+    }
 
+    function cancelOrder(orderId) {
+        if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+            $.ajax({
+                url: '/Accounts/CancelOrder',
+                type: 'POST',
+                data: { orderId: orderId },
+                success: function (data) {
+                    $('.col-md-9').html(data);
+                },
+                error: function () {
+                    alert('Đã có lỗi xảy ra khi hủy đơn hàng.');
+                }
+            });
+        }
+    }
+</script>

@@ -1,0 +1,62 @@
+﻿@model List<Order>
+
+<table class="table table-hover e-commerce-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ĐƠN HÀNG</th>
+            <th>NGÀY MUA</th>
+            <th>TỔNG TIỀN</th>
+            <th>TRẠNG THÁI</th>
+            <th>THANH TOÁN</th>
+            <th>#</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.OrderId</td>
+                    <td>@item.User.FullName</td>
+                    <td>@item.OrderDate</td>
+                    <td>@item.Total.Value.ToString("#,##0") VND</td>
+                    <td>@item.Status.Status</td>
+                    @if (item.IsPayment == true)
+                    {
+                        <td>Đã thanh toán</td>
+                    }
+                    else
+                    {
+                        <td>Chưa thanh toán</td>
+                    }
+
+                    <td>
+                        <a class="btn btn-primary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Details" asp-route-id="@item.OrderId" asp-route-classifyId="@ViewBag.ClassifyId">Xem chi tiết</a>
+                        <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Edit" asp-route-id="@item.OrderId" asp-route-classifyId="@ViewBag.ClassifyId">Sửa</a>
+                        @*<a class="btn btn-success btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Delete" asp-route-id="@item.OrderId" asp-route-classifyId="@ViewBag.ClassifyId">Delete</a>*@
+
+                        @if (item.StatusId == 3 || item.StatusId == 4)
+                        {
+
+                        }
+                        else
+                        {
+                            <a data-target="#modal-header" data-toggle="modal" class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="ChangeStatus" asp-route-id="@item.OrderId">Cập nhật trạng thái</a>
+                        }
+
+                        @if (item.IsPayment == false && item.StatusId != 4)
+                        {
+                            <form asp-area="Admin" asp-controller="AdminOrders" asp-action="ChangePayment" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@item.OrderId" />
+                                <button type="submit" class="btn btn-success btn-tone m-r-5">Đã thanh toán</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

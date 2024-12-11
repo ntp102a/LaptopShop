@@ -69,15 +69,22 @@
     </button>
     <div class="chatbot">
         <header>
-            <h2>Chatbot</h2>
+            <h2>TRẢ LỜI TỰ ĐỘNG</h2>
             <span class="close-btn material-symbols-outlined">close</span>
         </header>
         <ul class="chatbox">
             <li class="chat incoming">
                 <span class="material-symbols-outlined">smart_toy</span>
-                <p><strong>Lưu ý: </strong><br />Dữ liệu của Chatbot chỉ có trong trang của chúng tôi!</p>
+                <p><strong>Lưu ý: </strong>Dữ liệu chỉ có trong trang của chúng tôi!<br /><br /><strong>Gợi ý từ khóa: </strong><br />- lập trình<br />- đồ họa<br />- văn phòng<br />- chơi game</p>
             </li>
         </ul>
+        <div class="chat-options">
+            <button class="option-btn" data-value="Học lập trình">Học lập trình</button>
+            <button class="option-btn" data-value="Thiết kế đồ họa">Thiết kế Đồ họa</button>
+            <button class="option-btn" data-value="Làm việc văn phòng">Làm việc văn phòng</button>
+            <button class="option-btn" data-value="Laptop chơi game">Laptop Chơi game</button>
+            <button class="option-btn" data-value="Trả góp">Trả góp</button>
+        </div>
         <div class="chat-input">
             <textarea placeholder="Enter a message..."
                       spellcheck="false"
@@ -197,8 +204,8 @@
 
     .chatbot-toggler {
         position: fixed;
-        bottom: 50px;
-        right: 50px;
+        bottom: 40px;
+        right: 40px;
         outline: none;
         border: none;
         height: 50px;
@@ -236,7 +243,8 @@
         position: fixed;
         right: 35px;
         bottom: 90px;
-        width: 380px;
+        width: 30%;
+        height: 85%;
         background: #fff;
         border-radius: 15px;
         overflow: hidden;
@@ -248,6 +256,30 @@
         transition: all 0.1s ease;
         z-index: 9999999;
     }
+
+    .chat-options {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 15px;
+        position: absolute;
+        bottom: 11%;
+    }
+
+    .option-btn {
+        flex: 1 1 calc(50% - 10px);
+        padding: 10px;
+        font-size: 14px;
+        text-align: center;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
 
     body.show-chatbot .chatbot {
         display: block;
@@ -351,6 +383,7 @@
         position: absolute;
         bottom: 0;
         width: 100%;
+        height: 10%;
         background: #fff;
         padding: 3px 20px;
         border-top: 1px solid #ddd;
@@ -418,6 +451,29 @@
     const chatbox = document.querySelector(".chatbox");
     const chatInput = document.querySelector(".chat-input textarea");
     const sendChatBtn = document.querySelector(".chat-input span");
+    const chatOptions = document.querySelector(".chat-options");
+    const optionButtons = document.querySelectorAll(".option-btn");
+
+    optionButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const selectedOption = button.dataset.value;
+
+            // Tạo tin nhắn gửi đi
+            chatbox.appendChild(createChatLi(selectedOption, "outgoing"));
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+
+            // Ẩn options sau khi chọn
+            chatOptions.style.display = "none";
+
+            // Gửi request đến server
+            setTimeout(() => {
+                const incomingChatLi = createChatLi("Đang nghĩ...", "incoming");
+                chatbox.appendChild(incomingChatLi);
+                chatbox.scrollTo(0, chatbox.scrollHeight);
+                generateResponse(incomingChatLi, selectedOption);
+            }, 600);
+        });
+    });
 
     let userMessage = null;
     const inputInitHeight = chatInput.scrollHeight;
@@ -452,16 +508,16 @@
         }, 600);
     };
 
-    const generateResponse = async (chatElement) => {
+    const generateResponse = async (chatElement, userInput = null) => {
         const messageElement = chatElement.querySelector("p");
+        const input = userInput || userMessage;
 
         try {
             const response = await fetch("/Chatbot/GetResponse", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userInput: userMessage })
+                body: JSON.stringify({ userInput: input })
             });
-
 
             const data = await response.json();
             if (!response.ok) throw new Error(data.response);

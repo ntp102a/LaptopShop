@@ -1,10 +1,10 @@
 ﻿<div class="side-nav">
     <div class="side-nav-inner">
-        <ul class="side-nav-menu scrollable">            
-            <li class="nav-item dropdown">
+        <ul class="side-nav-menu scrollable">
+            <li class="nav-item">
                 <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminProducts" asp-action="Index">
                     <span class="icon-holder">
-                        <i class="anticon anticon-shopping-cart"></i>
+                        <i class="fas fa-laptop"></i>
                     </span>
                     <span class="title">Danh sách sản phẩm</span>
                 </a>
@@ -12,24 +12,38 @@
             <li class="nav-item">
                 <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminUsers" asp-action="Index">
                     <span class="icon-holder">
-                        <i class="anticon anticon-contacts"></i>
+                        <i class="fas fa-users"></i>
                     </span>
                     <span class="title">Quản lý Khách Hàng</span>
 
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminOrders" asp-action="Index">
+            <li class="nav-item dropdown">
+                <a class="dropdown-toggle" href="javascript:void(0);">
                     <span class="icon-holder">
-                        <i class="anticon anticon-file"></i>
+                        <i class="fas fa-history"></i>
                     </span>
                     <span class="title">Quản lý Đơn Hàng</span>
+                    <span class="arrow">
+                        <i class="arrow-icon"></i>
+                    </span>
                 </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a asp-area="Admin" asp-controller="AdminOrders" asp-action="Index" asp-route-id="1">Chưa hoàn thành</a>
+                    </li>
+                    <li>
+                        <a asp-area="Admin" asp-controller="AdminOrders" asp-action="Index" asp-route-id="2">Đã hoàn thành</a>
+                    </li>
+                    <li>
+                        <a asp-area="Admin" asp-controller="AdminOrders" asp-action="Index" asp-route-id="3">Đã hủy</a>
+                    </li>
+                </ul>
             </li>
             <li class="nav-item">
                 <a class="dropdown-toggle" asp-area="Admin" asp-controller="AdminRevenue" asp-action="Index">
                     <span class="icon-holder">
-                        <i class="anticon anticon-calculator"></i>
+                        <i class="fas fa-chart-line"></i>
                     </span>
                     <span class="title">Quản lý Doanh Thu</span>
                 </a>
@@ -37,7 +51,7 @@
             <li class="nav-item dropdown">
                 <a class="dropdown-toggle" href="javascript:void(0);">
                     <span class="icon-holder">
-                        <i class="anticon anticon-table"></i>
+                        <i class="fas fa-cogs"></i>
                     </span>
                     <span class="title">Quản lý hệ thống</span>
                     <span class="arrow">
@@ -50,17 +64,17 @@
                     </li>
                     <li>
                         <a asp-area="Admin" asp-controller="AdminRoles" asp-action="Index">Quản lý quyền truy cập</a>
-                    </li>                    
+                    </li>
                 </ul>
             </li>
             @*<li class="nav-item">
-                <a class="dropdown-toggle" asp-area="Admin" asp-controller="Dataset" asp-action="Index">
-                    <span class="icon-holder">
-                        <i class="anticon anticon-contacts"></i>
-                    </span>
-                    <span class="title">Tạo csv</span>
+            <a class="dropdown-toggle" asp-area="Admin" asp-controller="Dataset" asp-action="Index">
+            <span class="icon-holder">
+            <i class="anticon anticon-contacts"></i>
+            </span>
+            <span class="title">Tạo csv</span>
 
-                </a>
+            </a>
             </li>*@
         </ul>
     </div>

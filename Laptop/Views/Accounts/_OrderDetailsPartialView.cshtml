@@ -1,0 +1,172 @@
+﻿@model Order
+
+<div class="invoice-container">
+    <div class="invoice-header">
+        <h1>Hóa Đơn Mua Hàng</h1>
+    </div>
+
+    <div class="invoice-details">
+        <p><strong>Số hóa đơn:</strong> <span>#@Model.OrderId</span></p>
+        <p><strong>Ngày mua:</strong> <span>@Model.OrderDate?.ToString("HH:mm:ss dd/MM/yyyy")</span></p>
+        <p><strong>Người nhận:</strong> <span>@Model.RecipientName</span></p>
+        <p><strong>Số điện thoại:</strong> <span>@Model.Phone</span></p>
+        <p><strong>Ghi chú:</strong> <span>@Model.Note</span></p>
+        <p>
+            <strong>Thanh toán?:</strong>
+            <span class="payment-status @(Model.IsPayment.Value ? "paid" : "unpaid")">
+                @(Model.IsPayment.Value ? "Đã thanh toán" : "Chưa thanh toán")
+            </span>
+        </p>
+        <p><strong>Trạng thái:</strong> <span>@Model.Status.Status</span></p>
+    </div>
+
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrderDetails)
+            {
+                <tr>
+                    <td>@item.Product.ProductName</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Price?.ToString("#,##0 VND")</td>
+                    <td>
+                        @{
+                            var thanhTien = (item.Quantity * (item.Price ?? 0));
+                            @thanhTien?.ToString("#,##0 VND")
+                            ;
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p class="total">
+        Tổng cộng: <strong>@Model.Total?.ToString("#,##0 VND")</strong>
+    </p>
+
+    <div class="invoice-buttons">
+        <a data-name="Danh sách đơn hàng" onclick="setActive(this)" class="btn btn-secondary">Quay lại</a>
+        @if(Model.IsPayment == false && Model.StatusId == 1)
+        {
+            <a class="btn btn-danger" onclick="cancelOrder(@Model.OrderId)">Hủy đơn</a>
+        }
+    </div>
+</div>
+
+<style>
+    .invoice-container {
+        background: #f9f9f9;
+        padding: 30px;
+        border-radius: 12px;
+        color: #333;
+    }
+
+    .invoice-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+        .invoice-header h1 {
+            font-size: 28px;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #2980b9;
+            display: inline-block;
+            padding: 10px 20px;
+        }
+
+    .invoice-details p {
+        font-size: 16px;
+        margin: 8px 0;
+    }
+
+    .invoice-details strong {
+        color: #2c3e50;
+    }
+
+    .invoice-details span {
+        color: #7f8c8d;
+    }
+
+    .payment-status.paid {
+        color: green;
+        font-weight: bold;
+    }
+
+    .payment-status.unpaid {
+        color: red;
+        font-weight: bold;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .invoice-table th, .invoice-table td {
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .invoice-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+    .total {
+        text-align: right;
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+        color: #2c3e50;
+    }
+
+    .invoice-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-secondary {
+        background-color: #34495e;
+        color: #fff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #2c3e50;
+    }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        color: #fff;
+    }
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+    }
+</style>

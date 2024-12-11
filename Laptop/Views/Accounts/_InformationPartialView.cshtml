@@ -1,0 +1,85 @@
+﻿@model LaptopShop.Models.User
+
+<div class="account-container">
+    <div class="account-header">
+        <h2>Thông tin tài khoản</h2>
+    </div>
+    <div class="account-content">
+        <div class="info-item">
+            <i class="icon fas fa-user"></i>
+            <span class="label">Họ và tên:</span>
+            <span class="value">@Model.FullName</span>
+        </div>
+        <div class="info-item">
+            <i class="icon fas fa-envelope"></i>
+            <span class="label">Email:</span>
+            <span class="value">@Model.Email</span>
+        </div>
+        <div class="info-item">
+            <i class="icon fas fa-phone"></i>
+            <span class="label">Số điện thoại:</span>
+            <span class="value">@Model.Phone</span>
+        </div>
+        <div class="info-item">
+            <i class="icon fas fa-map-marker-alt"></i>
+            <span class="label">Địa chỉ:</span>
+            <span class="value">@Model.Address</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    .account-container {
+        max-width: 700px;
+        margin: 30px auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        font-family: 'Roboto', sans-serif;
+        color: #333;
+    }
+
+    .account-header h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .account-content {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        padding: 10px;
+        border-radius: 10px;
+        background: #ffffff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        color: #34495e;
+    }
+
+        .info-item .icon {
+            font-size: 20px;
+            color: #3498db;
+        }
+
+        .info-item .label {
+            font-weight: bold;
+            min-width: 120px;
+        }
+
+        .info-item .value {
+            color: #2c3e50;
+            flex-grow: 1;
+        }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

@@ -31,7 +31,7 @@ namespace LaptopShop.Areas.Admin.Controllers
         public IActionResult Index(int page = 1, int category_id = 0)
         {
             var pageNumber = page;
-            var pageSize = 5;
+            var pageSize = 10;
             List<Product> IsProducts = new List<Product>();
 
             // Lưu giá trị category_id vào ViewBag để sử dụng sau này

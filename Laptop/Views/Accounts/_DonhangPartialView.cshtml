@@ -7,17 +7,27 @@
                 <tr>
                     <th>ID</th>
                     <th>Ngày mua hàng</th>
-                    <th>Trạng thái</th>
                     <th>Tổng tiền</th>
-
+                    <th>Trạng thái</th>
+                    <th>Đã thanh toán</th>
+                    <th>#</th>
                 </tr>
                 @foreach (var item in Model)
                 {
                     <tr>
                         <td><a class="account-order-id" href="javascript:void(0)">#@item.OrderId</a></td>
                         <td><a class="account-order-id">@item.OrderDate</a></td>
-                        <td><a class="account-order-id">@item.Status.Status</a></td>
                         <td><a class="account-order-id">@item.Total.Value.ToString("#,##0") VND</a></td>
+                        <td><a class="account-order-id">@item.Status.Status</a></td>
+                        <td><a class="account-order-id">@(item.IsPayment.Value ? "Đã thanh toán" : "Chưa thanh toán")</a></td>
+                        @if(item.StatusId == 4)
+                        {
+                            <td><a data-name="Xem chi tiết" onclick="setDirect(this)" data-id="@item.OrderId" class="btn btn-danger">Xem chi tiết</a></td>
+                        }
+                        else
+                        {
+                            <td><a data-name="Xem chi tiết" onclick="setDirect(this)" data-id="@item.OrderId" class="btn btn-success">Xem chi tiết</a></td>
+                        }
                     </tr>
                 }
             </tbody>
@@ -28,4 +38,8 @@ else
 {
     <p>Chưa có đơn hàng!</p>
 }
-
+<style>
+    th, td {
+        text-align: center;
+    }
+</style>

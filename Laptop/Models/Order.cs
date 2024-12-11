@@ -19,6 +19,7 @@ namespace LaptopShop.Models
         public string? Note { get; set; }
         public string UserId { get; set; }
         public int? StatusId { get; set; }
+        public bool? IsPayment { get; set; }
 
         public virtual TransactStatus? Status { get; set; }
         public virtual User? User { get; set; }
