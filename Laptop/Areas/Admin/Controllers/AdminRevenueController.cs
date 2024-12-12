@@ -9,10 +9,13 @@ using LaptopShop.Models;
 using OfficeOpenXml;
 using System.IO;
 using OfficeOpenXml.Drawing.Chart;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace LaptopShop.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "1")]
     public class AdminRevenueController : Controller
     {
         private readonly laptopWebContext _context;

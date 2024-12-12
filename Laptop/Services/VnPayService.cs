@@ -29,7 +29,10 @@ namespace LaptopShop.Services
 
             vnpay.AddRequestData("vnp_OrderInfo", "Thanh toán cho đơn hàng:" + model.OrderId);
             vnpay.AddRequestData("vnp_OrderType", "other");
-            vnpay.AddRequestData("vnp_ReturnUrl", _config["VnPay:PaymentBackReturnUrl"]);
+            // Lấy domain từ HttpRequest
+            string domain = $"{context.Request.Scheme}://{context.Request.Host.Value}";
+            vnpay.AddRequestData("vnp_ReturnUrl", $"{domain}/Callback");
+            //vnpay.AddRequestData("vnp_ReturnUrl", _config["VnPay:PaymentBackReturnUrl"]);
 
             vnpay.AddRequestData("vnp_TxnRef", tick);
 

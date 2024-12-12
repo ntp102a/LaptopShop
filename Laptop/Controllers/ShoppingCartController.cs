@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace LaptopShop.Controllers
 {
+    [Authorize(Roles = "2")]
     public class ShoppingCartController : Controller
     {
         private readonly laptopWebContext _context;
