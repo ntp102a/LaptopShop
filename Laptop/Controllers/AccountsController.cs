@@ -539,5 +539,18 @@ namespace LaptopShop.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [AllowAnonymous]
+        [Route("/quen-mat-khau", Name = "ForgotPassword")]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("/quen-mat-khau", Name = "ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            return RedirectToAction("Login");
+        }
     }
 }

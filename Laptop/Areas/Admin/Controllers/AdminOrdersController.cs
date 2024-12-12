@@ -10,10 +10,13 @@ using AspNetCoreHero.ToastNotification.Abstractions;
 using PagedList.Core;
 using LaptopShop.ModelViews;
 using LaptopShop.Helpper;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace LaptopShop.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "1")]
     public class AdminOrdersController : Controller
     {
         private readonly laptopWebContext _context;

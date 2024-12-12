@@ -35,7 +35,6 @@
 
                     <td>
                         <a class="btn btn-primary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Details" asp-route-id="@item.OrderId" asp-route-classifyId="@ViewBag.ClassifyId">Xem chi tiết</a>
-                        <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Edit" asp-route-id="@item.OrderId" asp-route-classifyId="@ViewBag.ClassifyId">Sửa</a>
                         @*<a class="btn btn-success btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Delete" asp-route-id="@item.OrderId" asp-route-classifyId="@ViewBag.ClassifyId">Delete</a>*@
 
                         @if (item.StatusId == 3 || item.StatusId == 4)
@@ -44,6 +43,7 @@
                         }
                         else
                         {
+                            <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="Edit" asp-route-id="@item.OrderId" asp-route-classifyId="@ViewBag.ClassifyId">Sửa</a>
                             <a data-target="#modal-header" data-toggle="modal" class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminOrders" asp-action="ChangeStatus" asp-route-id="@item.OrderId">Cập nhật trạng thái</a>
                         }
 

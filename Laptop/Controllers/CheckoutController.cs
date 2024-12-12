@@ -15,6 +15,7 @@ using System.Security.Claims;
 
 namespace LaptopShop.Controllers
 {
+    [Authorize(Roles = "2")]
     public class CheckoutController : Controller
     {
         private readonly laptopWebContext _context;
