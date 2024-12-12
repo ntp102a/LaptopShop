@@ -948,7 +948,7 @@ textarea.input {
     .product .product-body {
         position: relative;
         padding: 15px;
-        background-color: blanchedalmond;
+        background-color: #fff;
         text-align: center;
         z-index: 20;
     }

@@ -13,6 +13,8 @@ using System.Security.Claims;
 using LaptopShop.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Caching.Memory;
+using System.Web;
+using Org.BouncyCastle.Crypto.Generators;
 
 namespace LaptopShop.Controllers
 {
@@ -540,16 +542,80 @@ namespace LaptopShop.Controllers
         }
 
         [AllowAnonymous]
-        [Route("/quen-mat-khau", Name = "ForgotPassword")]
+        [Route("/quen-mat-khau")]
         public IActionResult ForgotPassword()
         {
             return View();
         }
         [HttpPost]
         [AllowAnonymous]
-        [Route("/quen-mat-khau", Name = "ForgotPassword")]
+        [Route("/quen-mat-khau")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
+            var checkMail = _context.Users.FirstOrDefault(p => p.Email== email);
+            if (checkMail == null)
+            {
+                _notyfService.Error("Gmail này chưa được đăng ký");
+                return View();
+            }
+            // Tạo link reset mật khẩu
+            string token = Guid.NewGuid().ToString();
+            _cache.Set(token, email, TimeSpan.FromHours(1));
+
+            string domain = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}";
+            string resetLink = $"{domain}/doi-mat-khau/{token}";
+
+            string subject = "Đặt lại mật khẩu";
+            string body = $"<p>Xin chào {checkMail.FullName},</p>" +
+                          $"<p>Bạn đã yêu cầu đặt lại mật khẩu. Nhấp vào liên kết bên dưới để tiếp tục:</p>" +
+                          $"<p><a href='{resetLink}'>Đặt lại mật khẩu</a></p>" +
+                          $"<p>Liên kết này sẽ hết hạn sau 1 giờ.</p>";
+
+            EmailService emailService = new EmailService(_configuration);
+            await emailService.SendEmailAsync(email, subject, body);
+
+            _notyfService.Success("Gửi thành công. Vui lòng kiểm tra email.");
+            return RedirectToAction("Login");
+        }
+
+        [HttpGet]
+        [Route("/doi-mat-khau/{token}")]
+        public IActionResult NewPassword(string token)
+        {
+            if (!_cache.TryGetValue(token, out string email))
+            {
+                _notyfService.Error("Liên kết không hợp lệ hoặc đã hết hạn.");
+                return RedirectToAction("ForgotPassword");
+            }
+
+            ViewBag.Email = email;
+            return View();
+        }
+
+        [HttpPost]
+        [Route("/doi-mat-khau/{token}")]
+        public IActionResult NewPassword(ChangePasswordViewModel model, string token)
+        {
+            if (!_cache.TryGetValue(token, out string email))
+            {
+                _notyfService.Error("Liên kết không hợp lệ hoặc đã hết hạn.");
+                return RedirectToAction("ForgotPassword");
+            }
+
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (user == null)
+            {
+                _notyfService.Error("Người dùng không tồn tại.");
+                return RedirectToAction("ForgotPassword");
+            }
+
+            string newSalt = Utilities.GetRandomKey();
+            user.Salt = newSalt;
+            user.Password = (model.NewPassword + newSalt).ToMD5();
+            _context.Users.Update(user);
+            _context.SaveChanges();
+
+            _notyfService.Success("Đổi mật khẩu thành công.");
             return RedirectToAction("Login");
         }
     }
