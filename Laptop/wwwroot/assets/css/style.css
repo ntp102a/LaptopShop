@@ -17462,7 +17462,7 @@ img {
 /* ---Custom Container--- */
 @media (min-width: 1600px) {
     .container {
-        max-width: 1200px;
+        max-width: 80%;
     }
 }
 
