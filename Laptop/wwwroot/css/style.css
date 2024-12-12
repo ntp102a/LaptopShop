@@ -948,7 +948,7 @@ textarea.input {
     .product .product-body {
         position: relative;
         padding: 15px;
-        background-color: #FFF;
+        background-color: blanchedalmond;
         text-align: center;
         z-index: 20;
     }
@@ -962,6 +962,11 @@ textarea.input {
         .product .product-body .product-name {
             text-transform: uppercase;
             font-size: 14px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
 
             .product .product-body .product-name > a {
