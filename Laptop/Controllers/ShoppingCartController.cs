@@ -17,7 +17,7 @@ namespace LaptopShop.Controllers
             _context = context;
             _notyfService = notyfService;
         }
-
+        [AllowAnonymous]
         [HttpPost]
         [Route("api/cart/add")]
         public IActionResult AddtoCart(int productID, int? amount)

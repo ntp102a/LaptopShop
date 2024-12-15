@@ -334,7 +334,7 @@ namespace LaptopShop.Controllers
                     }
                     catch
                     {
-                        return RedirectToAction("DangKyTaiKhoan", "Accounts");
+                        return RedirectToAction("DangKyTaiKhoan");
                     }
                 }
                 else

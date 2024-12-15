@@ -158,6 +158,7 @@
                     success: function (response) {
                         if (response.result === 'Redirect') {
                             window.location = response.url;
+                            alert(response.message);
                         } else if (response.result === 'Success') {
                             loadHeaderCart();
                             location.reload();
