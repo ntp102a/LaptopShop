@@ -4,7 +4,6 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.EntityFrameworkCore.Query
 
-
 @{
     ViewData["Title"] = "Laptop Shop";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -17,20 +16,74 @@
         .Include(p => p.Image)
         .Where(p => productIds.Contains(p.ProductId))
         .ToList();
-
 }
+<!-- HEADER MENU -->
+<!-- MENU BAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <!-- Toggle button for mobile view -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Menu items -->
+        <div class="collapse navbar-collapse justify-content-center" id="navbarMenu">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-danger fw-bold" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#top-selling">Bán Chạy</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="/tat-ca-san-pham">Tất Cả Sản Phẩm</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#">Laptops</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#">Accessories</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+<!-- MAIN BANNER -->
+<div id="mainBannerCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="/images/banners-1.jpg" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Banner 1">
+        </div>
+        <div class="carousel-item">
+            <img src="/images/banners-2.png" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Banner 2">
+        </div>
+        <div class="carousel-item">
+            <img src="/images/banners-3.jpg" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Banner 3">
+        </div><div class="carousel-item">
+            <img src="/images/banners-4.jpg" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Banner 3">
+        </div>
+    </div>
+    <a class="carousel-control-prev" href="#mainBannerCarousel" role="button" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#mainBannerCarousel" role="button" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </a>
+</div>
 
 @if (User.Identity.IsAuthenticated)
 {
     @if (recommendProducts.Count() != 0)
     {
-        <!-- SECTION ALL PRODUCT -->
+        <!-- SECTION RECOMMENDED PRODUCTS -->
         <div class="section">
-            <!-- container -->
             <div class="container">
-                <!-- row -->
                 <div class="row">
-                    <!-- section title -->
                     <div class="col-md-12">
                         <div class="section-title">
                             <h3 class="title">Có thể bạn sẽ thích</h3>
@@ -41,39 +94,28 @@
                             </div>
                         </div>
                     </div>
-                    <!-- /section title -->
-                    <!-- Products tab & slick -->
                     <div class="col-md-12">
                         <div class="row">
                             <div class="products-tabs">
-                                <!-- tab -->
                                 <div id="tab1" class="active">
                                     <div class="row">
                                         @await Html.PartialAsync("_ListProductPartialView", recommendProducts)
                                     </div>
                                 </div>
-                                <!-- /tab -->
                             </div>
                         </div>
                     </div>
-                    <!-- Products tab & slick -->
                 </div>
-                <!-- /row -->
             </div>
-            <!-- /container -->
         </div>
-        <!-- END SECTION ALL PRODUCT -->
     }
 }
 else
 {
-    <!-- SECTION ALL PRODUCT -->
+    <!-- SECTION ALL PRODUCTS -->
     <div class="section">
-        <!-- container -->
         <div class="container">
-            <!-- row -->
             <div class="row">
-                <!-- section title -->
                 <div class="col-md-12">
                     <div class="section-title">
                         <h3 class="title">TẤT CẢ SẢN PHẨM</h3>
@@ -84,133 +126,187 @@ else
                         </div>
                     </div>
                 </div>
-                <!-- /section title -->
-                <!-- Products tab & slick -->
                 <div class="col-md-12">
                     <div class="row">
                         <div class="products-tabs">
-                            <!-- tab -->
                             <div id="tab1" class="active">
                                 <div class="row">
                                     @await Html.PartialAsync("_ListProductPartialView", allProducts)
                                 </div>
                             </div>
-                            <!-- /tab -->
                         </div>
                     </div>
                 </div>
-                <!-- Products tab & slick -->
             </div>
-            <!-- /row -->
         </div>
-        <!-- /container -->
     </div>
-    <!-- END SECTION ALL PRODUCT -->
 }
 
-<!-- SECTION TOP SELLING -->
-<div class="section">
-    <!-- container -->
-    <div class="container">
-        <!-- row -->
-        <div class="row">
+<!-- ADVERTISEMENT BANNER -->
+<div id="advertisementBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="/images/ad1.png" class="d-block w-100" style="height: 300px; object-fit: cover;" alt="Advertisement 1">
+        </div>
+        <div class="carousel-item">
+            <img src="/images/ad2.png" class="d-block w-100" style="height: 300px; object-fit: cover;" alt="Advertisement 2">
+        </div>
+        <div class="carousel-item">
+            <img src="/images/ad3.png" class="d-block w-100" style="height: 300px; object-fit: cover;" alt="Advertisement 3">
+        </div>
+    </div>
+    <a class="carousel-control-prev" href="#advertisementBannerCarousel" role="button" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#advertisementBannerCarousel" role="button" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </a>
+</div>
+<!-- Left - Right Banners-->
 
-            <!-- section title -->
+<!-- SECTION TOP SELLING -->
+<div class="section" id="top-selling">
+    <div class="container">
+        <div class="row">
             <div class="col-md-12">
                 <div class="section-title">
                     <h3 class="title">Bán chạy</h3>
                 </div>
             </div>
-            <!-- /section title -->
-            <!-- Products tab -->
             <div class="col-md-12">
                 <div class="row">
                     <div class="products-tabs">
-                        <!-- tab -->
                         <div id="tab2" class="active">
                             <div class="row">
                                 @await Html.PartialAsync("_ListProductPartialView", topProducts)
                             </div>
                         </div>
-                        <!-- /tab -->
                     </div>
                 </div>
             </div>
-            <!-- /Products tab -->
-            <!-- /Products tab & slick -->
         </div>
-        <!-- /row -->
     </div>
-    <!-- /container -->
 </div>
-<!-- END SECTION TOP SELLING -->
-<!-- SECTION GAME PRODUCT -->
-<div class="section">
-    <!-- container -->
-    <div class="container">
-        <!-- row -->
-        <div class="row">
 
-            <!-- section title -->
+<!-- GAME PRODUCT SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="row">
             <div class="col-md-12">
                 <div class="section-title">
                     <h3 class="title">Laptop Gaming</h3>
                 </div>
             </div>
-            <!-- /section title -->
-            <!-- Products tab -->
             <div class="col-md-12">
                 <div class="row">
                     <div class="products-tabs">
-                        <!-- tab -->
                         <div class="active">
                             <div class="row">
                                 @await Html.PartialAsync("_ListProductPartialView", gameProducts)
                             </div>
                         </div>
-                        <!-- /tab -->
                     </div>
                 </div>
             </div>
-            <!-- /Products tab -->
-            <!-- /Products tab & slick -->
         </div>
-        <!-- /row -->
     </div>
-    <!-- /container -->
 </div>
-<!-- END SECTION TOP SELLING -->
 
-@section Styles {
-    <style>
-        .section-title {
-            background-color: #343a40;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+<style>
+    /* Banner chính chiếm toàn bộ màn hình */
+    .main-banner img {
+        width: 100vw;
+        height: auto;
+        object-fit: cover;
+        margin-bottom: 5px;
+    }
+
+    /* Quảng cáo bên dưới */
+    .advertisement-banner img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        margin-bottom: 5px;
+    }
+
+    /* Loại bỏ margin của body để không ảnh hưởng đến toàn màn hình */
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden; /* Để tránh thanh cuộn ngang */
+    }
+
+    /* Điều chỉnh side-banner */
+    .side-banner {
+        position: fixed;
+        top: 150px;
+        width: 120px;
+        z-index: 10;
+    }
+
+        .side-banner img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
         }
 
-            .section-title .title {
-                font-size: 26px;
-                font-weight: 600;
-                color: #ffffff;
-                margin-bottom: 15px;
-            }
+    /* Section title */
+    .section-title {
+        background-color: #343a40;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
 
-        .section-nav .section-tab-nav li a {
-            font-size: 16px;
-            color: #007bff;
-            text-decoration: none;
-            background-color: transparent;
-            transition: all 0.3s ease;
+        .section-title .title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 15px;
         }
 
-            .section-nav .section-tab-nav li a:hover {
-                background-color: #007bff;
-                color: white;
-                transform: scale(1.05);
-            }
+    /* Điều chỉnh hiệu ứng link */
+    .section-nav .section-tab-nav li a {
+        font-size: 16px;
+        color: #007bff;
+        text-decoration: none;
+        background-color: transparent;
+        transition: all 0.3s ease;
+    }
 
-    </style>
+        .section-nav .section-tab-nav li a:hover {
+            background-color: #007bff;
+            color: white;
+            transform: scale(1.05);
+        }
+    /* Tạo gạch chân cho mục "Home" */
+    .nav-link.text-danger {
+        border-bottom: 2px solid red;
+    }
+
+    /* Hiệu ứng hover cho các mục menu */
+    .nav-link {
+        position: relative;
+        transition: color 0.3s;
+    }
+
+        .nav-link:hover {
+            color: red !important;
+        }
+
+    /* Căn chỉnh khoảng cách các mục menu */
+    .navbar-nav .nav-item {
+        margin: 0 10px;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+
+</style>
+
 }
