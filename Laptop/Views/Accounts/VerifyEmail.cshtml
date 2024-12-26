@@ -11,7 +11,7 @@
             <form asp-action="VerifyEmail" asp-route-email="@ViewBag.Email" method="post">
                 <div class="form-group">
                     <label for="code">Mã xác thực:</label>
-                    <input type="text" class="form-control" id="code" name="code" placeholder="Nhập mã xác thực" required maxlength="6" />
+                    <input type="text" class="form-control" id="code" name="code" placeholder="Nhập mã xác thực" required maxlength="6" pattern="^\d{6}$" inputmode="numeric" />
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block mt-3" style="background-color: black; border-color: black;">Xác thực</button>

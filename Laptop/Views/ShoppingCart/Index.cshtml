@@ -3,7 +3,7 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Giỏ hàng";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -31,27 +31,40 @@
                                         {
                                             foreach (var item in Model)
                                             {
-                                                <tr>
+                                                var isOutOfStock = item.Product.Instock == 0;
+                                                <tr class="@((isOutOfStock ? "out-of-stock" : ""))">
                                                     <td class="product_remove">
                                                         <input type="button" value="X" class="removeItem btn btn-primary" data-mahh="@item.Product.ProductId" />
                                                     </td>
-                                                    @*<td class="product-thumbnail">
-                                                        <a href="javascript:void(0)">
-                                                            <img style="max-width: 100px; max-height: 100px;" src="~/images//products/@item.product.Image.ImageThumb" alt="">
-                                                        </a>
-                                                    </td>*@
                                                     <td class="product-name">@item.Product.ProductName</td>
-                                                    <td class="product-price"><span class="amount">@item.Product.Price.Value.ToString("#, ##0") VND</span></td>
+                                                    <td class="product-price">
+                                                        <span class="amount">@item.Product.Price.Value.ToString("#, ##0") VND</span>
+                                                    </td>
                                                     <td class="quantity">
                                                         <div class="cart-plus-minus">
-                                                            <input data-mahh="@item.Product.ProductId" data-dongia="@item.Product.Price" class="cartItem cart-plus-minus-box" value="@item.Quantity" min="1" type="number">
+                                                            @if (!isOutOfStock)
+                                                            {
+                                                                <input data-mahh="@item.Product.ProductId" data-dongia="@item.Product.Price" class="cartItem cart-plus-minus-box" value="@item.Quantity" min="1" type="number">
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>Hết hàng</span>
+                                                            }
                                                         </div>
                                                     </td>
-                                                    <td class="product-subtotal"><span class="amount">@item.TotalMoney.ToString("#, ##0") VND</span></td>
+                                                    <td class="product-subtotal">
+                                                        @if (isOutOfStock)
+                                                        {
+                                                            <span class="amount" style="color: red;">Đã hết hàng</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="amount">@item.TotalMoney.ToString("#, ##0") VND</span>
+                                                        }
+                                                    </td>
                                                 </tr>
                                             }
                                         }
-
                                     </tbody>
                                 </table>
                             </div>
@@ -60,18 +73,16 @@
                                     <div class="cart-page-total">
                                         <h2>Tổng đơn hàng</h2>
                                         <ul>
-                                            <li>Thành tiền <span>@Model.Sum(x => x.TotalMoney).ToString("#, ##0") VND</span></li>
+                                            <li>
+                                                Thành tiền <span>
+                                                    @Model.Where(x => x.Product.Instock > 0).Sum(x => x.TotalMoney).ToString("#, ##0") VND
+                                                </span>
+                                            </li>
                                         </ul>
-                                        @if (User.Identity.IsAuthenticated)
+                                        @if (Model.Where(x => x.Product.Instock > 0).Sum(x => x.TotalMoney) > 0)
                                         {
                                             <a href="/thanh-toan" class="btn btn-secondary btn-primary-hover">Thanh toán</a>
                                         }
-                                        else
-                                        {
-                                            <a href="/dang-nhap?returnUrl=/thanh-toan" class="btn btn-secondary btn-primary-hover">Thanh toán</a>
-
-                                        }
-
                                     </div>
                                 </div>
                             </div>
@@ -79,9 +90,8 @@
                     }
                     else
                     {
-                        <p>Chưa có sản phẩm</p>
+                        <p>Chưa có sản phẩm trong giỏ hàng</p>
                     }
-
                 </div>
             </div>
         </div>
@@ -95,6 +105,7 @@
                 $("#miniCart").load("/AjaxContent/HeaderCart");
                 $("#numberCart").load("/AjaxContent/NumberCart");
             }
+
             $(".removeItem").click(function () {
                 var productid = $(this).attr("data-mahh");
                 $.ajax({
@@ -116,6 +127,7 @@
                     }
                 });
             });
+
             $(".cartItem").click(function () {
                 var productid = $(this).attr("data-mahh");
                 var soluong = parseInt($(this).val());

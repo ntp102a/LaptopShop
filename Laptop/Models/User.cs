@@ -21,6 +21,7 @@ namespace LaptopShop.Models
         public int? RoleId { get; set; }
         public string? Salt { get; set; }
         public bool IsVerified { get; set; } = false;
+        public bool IsLocked { get; set; } = false;
 
         public virtual Role? Role { get; set; }
         public virtual ICollection<Cart> Carts { get; set; }

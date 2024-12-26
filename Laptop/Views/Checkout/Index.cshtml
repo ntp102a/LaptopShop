@@ -111,18 +111,18 @@
                                 Thanh toán khi nhận hàng
                             </label>
                         </div>
-                        @*<div class="input-radio">
-                            <input type="radio" id="payment-2" name="PaymentMethod" value="Paypal">
-                            <label for="payment-2">
-                                <span></span>
-                                PayPal
-                            </label>
-                        </div>*@
                         <div class="input-radio">
                             <input type="radio" id="payment-2" name="PaymentMethod" value="VnPay">
                             <label for="payment-2">
                                 <span></span>
                                 VnPay
+                            </label>
+                        </div>
+                        <div class="input-radio">
+                            <input type="radio" id="payment-3" name="PaymentMethod" value="Paypal">
+                            <label for="payment-3">
+                                <span></span>
+                                PayPal
                             </label>
                         </div>
                     </div>
@@ -131,9 +131,9 @@
                     <div class="order-button-payment">
                         <input value="XÁC NHẬN ĐẶT HÀNG" type="submit">
                     </div>
-                    <a asp-action="PaypalCheckout">
+                    @*<a asp-action="PaypalCheckout">
                         <img src="~/images/paypal_checkout.gif" height="100" />
-                    </a>
+                    </a>*@
                     @*<a asp-action="VnPayCheckout">
                         <img src="~/images/Logo-VNPAY-QR.gif" height="100" />
                     </a>*@

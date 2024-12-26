@@ -59,7 +59,7 @@ namespace LaptopShop.Controllers
             if (taikhoanID != null)
             {
                 var recommendations = _recommendationService.GetHybridRecommendations(taikhoanID);
-                var filteredRecommendations = recommendations.Where(item => item.PredictedRating > 0.5).ToList();
+                var filteredRecommendations = recommendations.Where(item => item.PredictedRating > 0.1).ToList();
 
                 var productIds = filteredRecommendations.Select(r => r.ProductId).ToList();
 

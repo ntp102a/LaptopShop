@@ -24,7 +24,14 @@
         </div>
         <div class="cart-btns">
             <a href="/gio-hang">Giỏ hàng</a>
-            <a href="/thanh-toan">Thanh toán<i class="fa fa-arrow-circle-right"></i></a>
+            @if (Model.Where(x => x.Product.Instock > 0).Sum(x => x.TotalMoney) > 0)
+            {
+                <a href="/thanh-toan">Thanh toán<i class="fa fa-arrow-circle-right"></i></a>
+            }
+            else
+            {
+                <a href="/gio-hang">Thanh toán<i class="fa fa-arrow-circle-right"></i></a>
+            }
         </div>
     </div>
 }
@@ -34,10 +41,10 @@ else
         <div class="cart-list">
             Hãy thêm sản phẩm vào giỏ hàng
         </div>
-        <div class="cart-btns">
+        @*<div class="cart-btns">
             <a href="/gio-hang">Giỏ hàng</a>
             <a href="/thanh-toan">Thanh toán<i class="fa fa-arrow-circle-right"></i></a>
-        </div>
+        </div>*@
     </div>
 }
 

@@ -18,7 +18,11 @@
                     <img width="250" height="250" src="/images/products/@item.Image.ImageThumb" alt="">
                 </a>
                 <div class="product-label">
-                    @if (discount > 0)
+                    @if (item.Instock == 0)
+                    {
+                        <span class="sale">Hết hàng</span>
+                    }
+                    else if (discount > 0)
                     {
                         <span class="sale">-@item.Discount%</span>
                     }
@@ -33,13 +37,16 @@
                     }
                 </h4>
             </div>
-            <div class="add-to-cart">
-                <button class="add-to-cart-btn">
-                    <i class="fa fa-shopping-cart"></i>
-                    Thêm vào giỏ hàng
-                    <input hidden asp-for="@item.ProductId" />
-                </button>
-            </div>
+            @if (item.Instock != 0)
+            {
+                <div class="add-to-cart">
+                    <button class="add-to-cart-btn">
+                        <i class="fa fa-shopping-cart"></i>
+                        Thêm vào giỏ hàng
+                        <input hidden asp-for="@item.ProductId" />
+                    </button>
+                </div>
+            }
         </div>
     </div>
     <!-- /product -->

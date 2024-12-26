@@ -28,9 +28,9 @@ namespace LaptopShop.Areas.Admin.Controllers
         }
 
         // GET: Admin/AdminProducts
-        public IActionResult Index(int page = 1, int category_id = 0)
+        public IActionResult Index(int? page, int category_id = 0)
         {
-            var pageNumber = page;
+            var pageNumber = page == null || page <= 0 ? 1 : page.Value;
             var pageSize = 10;
             List<Product> IsProducts = new List<Product>();
 

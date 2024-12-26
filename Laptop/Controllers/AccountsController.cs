@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 using System.Web;
 using Org.BouncyCastle.Crypto.Generators;
+using Microsoft.ML;
 
 namespace LaptopShop.Controllers
 {
@@ -257,11 +258,19 @@ namespace LaptopShop.Controllers
                 // Cập nhật trạng thái đơn hàng
                 order.StatusId = 4;
                 _context.Update(order);
+
+                var listProduct = _context.OrderDetails.Where(p => p.OrderId == orderId).Include(p => p.Product).ToList();
+                foreach(var item in listProduct)
+                {
+                    item.Product.Instock += item.Quantity;
+                    _context.Products.Update(item.Product);
+                }
+                
                 _context.SaveChanges();
 
                 _notyfService.Success("Đơn hàng đã được hủy thành công.");
 
-                return RedirectToAction("GetDashboardInfo", new {title = "Danh sách đơn hàng" });
+                return RedirectToAction("GetDashboardInfo", new { title = "Danh sách đơn hàng" });
             }
             catch (Exception ex)
             {
@@ -307,6 +316,7 @@ namespace LaptopShop.Controllers
                         Salt = salt,
                         RoleId = 2,
                         IsVerified = false,
+                        IsLocked = false
                     };
                     try
                     {
@@ -489,6 +499,12 @@ namespace LaptopShop.Controllers
                     return RedirectToAction("VerifyEmail", new { email = customer.Email });
                 }
 
+                if (khachhang.IsLocked)
+                {
+                    _notyfService.Warning("Tài khoản đã bị khóa, vui lòng liên hệ admin để mở lại.");
+                    return RedirectToAction("Login");
+                }
+
                 HttpContext.Session.SetString("UserId", khachhang.UserId.ToString());
 
                 var taikhoanID = HttpContext.Session.GetString("UserId");
@@ -552,7 +568,7 @@ namespace LaptopShop.Controllers
         [Route("/quen-mat-khau")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
-            var checkMail = _context.Users.FirstOrDefault(p => p.Email== email);
+            var checkMail = _context.Users.FirstOrDefault(p => p.Email == email);
             if (checkMail == null)
             {
                 _notyfService.Error("Gmail này chưa được đăng ký");
