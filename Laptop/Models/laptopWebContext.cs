@@ -104,9 +104,7 @@ namespace LaptopShop.Models
 
                 entity.Property(e => e.InfoId).HasColumnName("info_id");
 
-                entity.Property(e => e.ConnectGate)
-                    .HasMaxLength(255)
-                    .HasColumnName("connectGate");
+                entity.Property(e => e.ConnectGate).HasColumnName("connectGate");
 
                 entity.Property(e => e.Cpu)
                     .HasMaxLength(255)
@@ -326,6 +324,7 @@ namespace LaptopShop.Models
 
                 entity.Property(e => e.RoleId).HasColumnName("roleId");
                 entity.Property(e => e.IsVerified).HasColumnName("is_verified");
+                entity.Property(e => e.IsLocked).HasColumnName("is_locked");
 
                 entity.Property(e => e.Salt)
                     .HasMaxLength(5)

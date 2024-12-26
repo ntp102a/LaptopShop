@@ -21,7 +21,7 @@
             <div class="col-lg-8">
             </div>
             <div class="col-lg-4 text-right">
-                <a class="btn btn-primary" asp-controller="AdminCategories" asp-action="Create"> <i class="anticon anticon-plus-circle m-r-5"></i> <span>Thêm</span></a>
+                <a class="btn btn-primary" asp-controller="AdminCategories" asp-action="Create"> <i class="anticon anticon-plus-circle m-r-5"></i> <span>Thêm mới</span></a>
 
             </div>
         </div>
@@ -30,7 +30,7 @@
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Name</th>
+                        <th scope="col">Tên</th>
                         <th scope="col">#</th>
                     </tr>
                 </thead>
@@ -43,9 +43,9 @@
                                 <th scope="row">@item.CategoryId</th>
                                 <td>@item.CategoryName</td>
                                 <td>
-                                    <a class="btn btn-primary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminCategories" asp-action="Details" asp-route-id="@item.CategoryId">View</a>
-                                    <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminCategories" asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a>
-                                    <a class="btn btn-success btn-tone m-r-5" asp-area="Admin" asp-controller="AdminCategories" asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+                                    <a class="btn btn-primary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminCategories" asp-action="Details" asp-route-id="@item.CategoryId">Xem</a>
+                                    <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminCategories" asp-action="Edit" asp-route-id="@item.CategoryId">Sửa</a>
+                                    <a class="btn btn-success btn-tone m-r-5" asp-area="Admin" asp-controller="AdminCategories" asp-action="Delete" asp-route-id="@item.CategoryId">Xóa</a>
                                     <a class="btn btn-success btn-tone m-r-5" asp-area="Admin" asp-controller="AdminCategories" asp-action="ChangePriceProducts" asp-route-id="@item.CategoryId">Thay đổi giá nhiều sản phẩm</a>
                                 </td>
                             </tr>

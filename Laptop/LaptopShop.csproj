@@ -8,16 +8,12 @@
 
 	<ItemGroup>
 		<Compile Remove="Areas\Admin\Data\**" />
-		<Compile Remove="Areas\Admin\Views\AdminProducts\**" />
     <Compile Remove="wwwroot\lib\**" />
 		<Content Remove="Areas\Admin\Data\**" />
-		<Content Remove="Areas\Admin\Views\AdminProducts\**" />
     <Content Remove="wwwroot\lib\**" />
 		<EmbeddedResource Remove="Areas\Admin\Data\**" />
-		<EmbeddedResource Remove="Areas\Admin\Views\AdminProducts\**" />
     <EmbeddedResource Remove="wwwroot\lib\**" />
 		<None Remove="Areas\Admin\Data\**" />
-		<None Remove="Areas\Admin\Views\AdminProducts\**" />
     <None Remove="wwwroot\lib\**" />
 	</ItemGroup>
 

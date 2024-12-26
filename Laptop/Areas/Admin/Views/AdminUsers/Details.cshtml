@@ -17,7 +17,6 @@
 
 <div class="card">
     <div class="card-body">
-        <h4 class="card-title">Thông tin người dùng : @Model.FullName</h4>
         <div class="table-responsive">
             <table class="product-info-table m-t-20">
                 <tbody>
@@ -45,6 +44,17 @@
                         <td>Vai trò:</td>
                         <td>@Model.Role.RoleName</td>
                     </tr>
+                    <tr>
+                        <td>
+                            <form asp-controller="AdminUsers"
+                                  asp-action="@(Model.IsLocked ? "UnLocked" : "Delete")"
+                                  asp-route-id="@Model.UserId">
+                                <input type="hidden" asp-for="UserId" />
+                                <input type="submit" value="@(Model.IsLocked ? "Mở khóa tài khoản" : "Khóa tài khoản")" class="btn btn-danger" />
+                            </form>
+                        </td>
+                    </tr>
+
                 </tbody>
             </table>
         </div>

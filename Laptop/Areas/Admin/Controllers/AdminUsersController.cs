@@ -199,44 +199,37 @@ namespace LaptopShop.Areas.Admin.Controllers
             {
                 return Problem("Entity set 'laptopWebContext.Users'  is null.");
             }
-            
-            var cart = _context.Carts.FirstOrDefault(x => x.UserId == id);
-            if (cart != null)
+
+            var user = await _context.Users.FindAsync(id);
+            if (user != null)
             {
-                _context.Carts.Remove(cart);
-                _context.SaveChanges();
+                user.IsLocked = true;
+                _context.Users.Update(user);
             }
 
-            var order = _context.Orders.Where(x => x.UserId == id).ToList();
-            if (order != null)
+            await _context.SaveChangesAsync();
+            _notyfService.Success("Khóa tài khoản thành công");
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpPost]
+        public async Task<IActionResult> UnLocked(string id)
+        {
+            if (_context.Users == null)
             {
-                foreach (var item in order)
-                {
-                    var orderDetail = _context.OrderDetails.Where(x => x.OrderId == item.OrderId).ToList();
-                    if(orderDetail != null)
-                    {
-                        foreach (var items in orderDetail)
-                        {
-                            _context.OrderDetails.Remove(items);
-                        }
-                        _context.SaveChanges();
-                    }
-                    _context.Orders.Remove(item);
-                    _context.SaveChanges();
-                }
+                return Problem("Entity set 'laptopWebContext.Users'  is null.");
             }
 
             var user = await _context.Users.FindAsync(id);
             if (user != null)
             {
-                _context.Users.Remove(user);
+                user.IsLocked = false;
+                _context.Users.Update(user);
             }
 
             await _context.SaveChangesAsync();
-            _notyfService.Success("Xoá thành công");
+            _notyfService.Success("Mở khóa tài khoản thành công");
             return RedirectToAction(nameof(Index));
         }
-
         private bool UserExists(string id)
         {
             return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();

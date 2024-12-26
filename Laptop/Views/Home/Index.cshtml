@@ -36,34 +36,32 @@
                     <a class="nav-link text-dark" href="#top-selling">Bán Chạy</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link text-dark" href="#laptops-gaming">Laptop Gaming</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link text-dark" href="/tat-ca-san-pham">Tất Cả Sản Phẩm</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="#">Laptops</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-dark" href="#">Accessories</a>
+                    <a class="nav-link text-dark" href="#">Phụ kiện</a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
 
-
-
 <!-- MAIN BANNER -->
 <div id="mainBannerCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
         <div class="carousel-item active">
-            <img src="/images/banners-1.jpg" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Banner 1">
+            <img src="/images/banners-1.jpg" class="d-block w-100" style="height: 430px; object-fit: cover;" alt="Banner 1">
         </div>
         <div class="carousel-item">
-            <img src="/images/banners-2.png" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Banner 2">
+            <img src="/images/banners-2.png" class="d-block w-100" style="height: 430px; object-fit: cover;" alt="Banner 2">
         </div>
         <div class="carousel-item">
-            <img src="/images/banners-3.jpg" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Banner 3">
+            <img src="/images/banners-3.jpg" class="d-block w-100" style="height: 430px; object-fit: cover;" alt="Banner 3">
         </div><div class="carousel-item">
-            <img src="/images/banners-4.jpg" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Banner 3">
+            <img src="/images/banners-4.jpg" class="d-block w-100" style="height: 430px; object-fit: cover;" alt="Banner 3">
         </div>
     </div>
     <a class="carousel-control-prev" href="#mainBannerCarousel" role="button" data-bs-slide="prev">
@@ -142,7 +140,6 @@ else
     </div>
 }
 
-<!-- ADVERTISEMENT BANNER -->
 <div id="advertisementBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
     <div class="carousel-inner">
         <div class="carousel-item active">
@@ -164,7 +161,6 @@ else
         <span class="visually-hidden">Next</span>
     </a>
 </div>
-<!-- Left - Right Banners-->
 
 <!-- SECTION TOP SELLING -->
 <div class="section" id="top-selling">
@@ -191,7 +187,7 @@ else
 </div>
 
 <!-- GAME PRODUCT SECTION -->
-<div class="section">
+<div class="section" id="laptops-gaming">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -214,99 +210,98 @@ else
     </div>
 </div>
 
-<style>
-    /* Banner chính chiếm toàn bộ màn hình */
-    .main-banner img {
-        width: 100vw;
-        height: auto;
-        object-fit: cover;
-        margin-bottom: 5px;
-    }
+@section Styles {
+    <style>
+        /* Banner chính chiếm toàn bộ màn hình */
+        .main-banner img {
+            width: 100vw;
+            height: auto;
+            object-fit: cover;
+            margin-bottom: 5px;
+        }
 
-    /* Quảng cáo bên dưới */
-    .advertisement-banner img {
-        width: 100%;
-        height: auto;
-        object-fit: cover;
-        margin-bottom: 5px;
-    }
-
-    /* Loại bỏ margin của body để không ảnh hưởng đến toàn màn hình */
-    body {
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden; /* Để tránh thanh cuộn ngang */
-    }
-
-    /* Điều chỉnh side-banner */
-    .side-banner {
-        position: fixed;
-        top: 150px;
-        width: 120px;
-        z-index: 10;
-    }
-
-        .side-banner img {
+        /* Quảng cáo bên dưới */
+        .advertisement-banner img {
             width: 100%;
             height: auto;
             object-fit: cover;
+            margin-bottom: 5px;
         }
 
-    /* Section title */
-    .section-title {
-        background-color: #343a40;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
-    }
-
-        .section-title .title {
-            font-size: 26px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 15px;
+        /* Loại bỏ margin của body để không ảnh hưởng đến toàn màn hình */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Để tránh thanh cuộn ngang */
         }
 
-    /* Điều chỉnh hiệu ứng link */
-    .section-nav .section-tab-nav li a {
-        font-size: 16px;
-        color: #007bff;
-        text-decoration: none;
-        background-color: transparent;
-        transition: all 0.3s ease;
-    }
-
-        .section-nav .section-tab-nav li a:hover {
-            background-color: #007bff;
-            color: white;
-            transform: scale(1.05);
-        }
-    /* Tạo gạch chân cho mục "Home" */
-    .nav-link.text-danger {
-        border-bottom: 2px solid red;
-    }
-
-    /* Hiệu ứng hover cho các mục menu */
-    .nav-link {
-        position: relative;
-        transition: color 0.3s;
-    }
-
-        .nav-link:hover {
-            color: red !important;
+        /* Điều chỉnh side-banner */
+        .side-banner {
+            position: fixed;
+            top: 150px;
+            width: 120px;
+            z-index: 10;
         }
 
-    /* Căn chỉnh khoảng cách các mục menu */
-    .navbar-nav .nav-item {
-        margin: 0 10px;
-    }
+            .side-banner img {
+                width: 100%;
+                height: auto;
+                object-fit: cover;
+            }
 
-    html {
-        scroll-behavior: smooth;
-    }
+        /* Section title */
+        .section-title {
+            background-color: #343a40;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
 
+            .section-title .title {
+                font-size: 26px;
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 15px;
+            }
 
-</style>
+        /* Điều chỉnh hiệu ứng link */
+        .section-nav .section-tab-nav li a {
+            font-size: 16px;
+            color: #007bff;
+            text-decoration: none;
+            background-color: transparent;
+            transition: all 0.3s ease;
+        }
 
+            .section-nav .section-tab-nav li a:hover {
+                background-color: #007bff;
+                color: white;
+                transform: scale(1.05);
+            }
+        /* Tạo gạch chân cho mục "Home" */
+        .nav-link.text-danger {
+            border-bottom: 2px solid red;
+        }
+
+        /* Hiệu ứng hover cho các mục menu */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+
+            .nav-link:hover {
+                color: red !important;
+            }
+
+        /* Căn chỉnh khoảng cách các mục menu */
+        .navbar-nav .nav-item {
+            margin: 0 10px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+    </style>
 }

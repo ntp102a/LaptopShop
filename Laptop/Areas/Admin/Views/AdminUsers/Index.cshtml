@@ -16,14 +16,13 @@
         </nav>
     </div>
 </div>
-<div class="card">    
-    <div class="card-body"> 
+<div class="card">
+    <div class="card-body">
         <div class="row m-b-30">
             <div class="col-lg-8">
             </div>
             <div class="col-lg-4 text-right">
-                <a class="btn btn-primary" asp-controller="AdminUsers" asp-action="Create"> <i class="anticon anticon-plus-circle m-r-5"></i> <span>Add User</span></a>
-
+                <a class="btn btn-primary" asp-controller="AdminUsers" asp-action="Create"> <i class="anticon anticon-plus-circle m-r-5"></i> <span>Thêm mới</span></a>
             </div>
         </div>
         <div class="table-responsive">
@@ -43,16 +42,15 @@
                     {
                         foreach (var item in Model)
                         {
-                            <tr>
+                            <tr style="@(item.IsLocked ? "color: red;" : "")">
                                 <td>@item.UserId</td>
                                 <td>@item.Email</td>
                                 <td>@item.FullName</td>
-                                <td>@item.Address</td>
+                                <td>@(string.IsNullOrEmpty(item.Address) ? "null" : item.Address)</td>
                                 <td>@item.Phone</td>
                                 <td>
-                                    <a class="btn btn-primary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminUsers" asp-action="Details" asp-route-id="@item.UserId">View</a>
-                                    <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminUsers" asp-action="Edit" asp-route-id="@item.UserId">Edit</a>
-                                    <a class="btn btn-success btn-tone m-r-5" asp-area="Admin" asp-controller="AdminUsers" asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
+                                    <a class="btn btn-primary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminUsers" asp-action="Details" asp-route-id="@item.UserId">Xem</a>
+                                    <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminUsers" asp-action="Edit" asp-route-id="@item.UserId">Sửa</a>
                                 </td>
                             </tr>
                         }
@@ -69,3 +67,4 @@
         </div>
     </div>
 </div>
+

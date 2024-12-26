@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using PayPal.Core;
+using PayPal.v1.Identity;
 using PayPal.v1.Payments;
 using System.Diagnostics;
+using System.Net;
 using System.Security.Claims;
 
 namespace LaptopShop.Controllers
@@ -46,7 +48,7 @@ namespace LaptopShop.Controllers
                     var gioHang = _context.Carts
                         .Include(c => c.Product)
                         .Include(c => c.User)
-                        .Where(c => c.UserId == accountID)
+                        .Where(c => c.UserId == accountID && c.Product.Instock > 0)
                         .ToList();
 
                     var cartItems = gioHang.Select(c => new Cart
@@ -97,7 +99,7 @@ namespace LaptopShop.Controllers
                     // Lấy giỏ hàng từ CSDL
                     var cart = _context.Carts
                         .Include(c => c.Product)
-                        .Where(c => c.UserId == accountID)
+                        .Where(c => c.UserId == accountID && c.Product.Instock > 0)
                         .Select(c => new Cart
                         {
                             Product = c.Product,
@@ -121,7 +123,7 @@ namespace LaptopShop.Controllers
         [Authorize]
         [HttpPost]
         [Route("/thanh-toan", Name = "Index")]
-        public IActionResult Index(MuaHangVM muahang)
+        public async Task<IActionResult> Index(MuaHangVM muahang)
         {
             try
             {
@@ -153,6 +155,20 @@ namespace LaptopShop.Controllers
 
                     return Redirect(_vnPayservice.CreatePaymentUrl(HttpContext, vnPayModel));
                 }
+                else if (paymentMethod == "Paypal")
+                {
+                    var paypalUrl = await PaypalCheckout(muahang);
+                    if (!string.IsNullOrEmpty(paypalUrl))
+                    {
+                        return Redirect(paypalUrl);
+                    }
+                    else
+                    {
+                        // Thông báo lỗi nếu không thể lấy URL PayPal
+                        TempData["Error"] = "Không thể kết nối với PayPal. Vui lòng thử lại.";
+                        return RedirectToAction("Index");
+                    }
+                }
 
                 var accountID = User.Identity.GetAccountID();
 
@@ -160,7 +176,7 @@ namespace LaptopShop.Controllers
                 {
                     var cart = _context.Carts
                         .Include(c => c.Product)
-                        .Where(c => c.UserId == accountID)
+                        .Where(c => c.UserId == accountID && c.Product.Instock > 0)
                         .ToList();
 
                     var khachhang = _context.Users
@@ -209,8 +225,10 @@ namespace LaptopShop.Controllers
                         }
                     }
 
+                    _context.Carts.RemoveRange(cart);
+
                     _context.SaveChanges();
-                    HttpContext.Session.Remove("GioHang");
+                    //HttpContext.Session.Remove("GioHang");
                     _notyfService.Success("Đặt hàng thành công");
                     return RedirectToAction("Success");
                 }
@@ -259,7 +277,7 @@ namespace LaptopShop.Controllers
                 // Lấy thông tin giỏ hàng của người dùng
                 var cart = _context.Carts
                     .Include(c => c.Product)
-                    .Where(c => c.UserId == accountID)
+                    .Where(c => c.UserId == accountID && c.Product.Instock > 0)
                     .ToList();
 
                 // Tạo đơn hàng mới
@@ -301,6 +319,8 @@ namespace LaptopShop.Controllers
                     }
                 }
 
+                _context.Carts.RemoveRange(cart);
+
                 // Lưu tất cả thay đổi vào cơ sở dữ liệu
                 _context.SaveChanges();
 
@@ -312,8 +332,6 @@ namespace LaptopShop.Controllers
             TempData["Message"] = "Có lỗi xảy ra trong quá trình xử lý thanh toán.";
             return RedirectToAction("Fail");
         }
-
-
 
         private string GenerateOrderTableHtml(List<dynamic> orderDetails)
         {
@@ -386,18 +404,18 @@ namespace LaptopShop.Controllers
                         emailService.SendEmailAsync(email, subject, body);
 
 
-                        var cartItems = _context.Carts
-                            .Where(c => c.UserId == accountID)
-                            .ToList();
+                        //var cartItems = _context.Carts
+                        //    .Where(c => c.UserId == accountID)
+                        //    .ToList();
 
-                        _context.Carts.RemoveRange(cartItems);
-                        _context.SaveChanges();
+                        //_context.Carts.RemoveRange(cartItems);
+                        //_context.SaveChanges();
 
                         return View(successVM);
                     }
                 }
                 _notyfService.Error("Đặt hàng không thành công");
-                return RedirectToAction("Login", "Accounts", new { returnUrl = "/dat-hang-thanh-cong.html" });
+                return RedirectToAction("Login", "Accounts", new { returnUrl = "/dat-hang-thanh-cong" });
             }
             catch
             {
@@ -414,7 +432,7 @@ namespace LaptopShop.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> PaypalCheckout()
+        public async Task<string> PaypalCheckout(MuaHangVM muahang)
         {
             var environment = new SandboxEnvironment(_clientId, _clientSecret);
             var client = new PayPalHttpClient(environment);
@@ -447,6 +465,16 @@ namespace LaptopShop.Controllers
                     });
                 }
 
+                itemList.ShippingAddress = new ShippingAddress()
+                {
+                    RecipientName = muahang.FullName,
+                    Line1 = muahang.Address,
+                    City = "Default City",
+                    State = "Default State",
+                    PostalCode = "000000",
+                    CountryCode = "VN"
+                };
+
                 var paypalOrderId = DateTime.Now.Ticks;
                 var hostname = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
 
@@ -454,35 +482,36 @@ namespace LaptopShop.Controllers
                 {
                     Intent = "sale",
                     Transactions = new List<Transaction>()
-            {
-                new Transaction()
-                {
-                    Amount = new Amount()
                     {
-                        Total = total.ToString(),
-                        Currency = "USD",
-                        Details = new AmountDetails
+                        new Transaction()
                         {
-                            Tax = "0",
-                            Shipping = "0",
-                            Subtotal = total.ToString(),
+                            Amount = new Amount()
+                            {
+                                Total = total.ToString(),
+                                Currency = "USD",
+                                Details = new AmountDetails
+                                {
+                                    Tax = "0",
+                                    Shipping = "0",
+                                    Subtotal = total.ToString(),
+                                }
+                            },
+                            ItemList = itemList,
+                            Description = $"Invoice #{paypalOrderId}",
+                            InvoiceNumber = paypalOrderId.ToString()
                         }
                     },
-                    ItemList = itemList,
-                    Description = $"Invoice #{paypalOrderId}",
-                    InvoiceNumber = paypalOrderId.ToString()
-                }
-            },
                     RedirectUrls = new RedirectUrls()
                     {
                         CancelUrl = $"{hostname}/dat-hang-khong-thanh-cong",
-                        ReturnUrl = $"{hostname}/dat-hang-thanh-cong"
+                        ReturnUrl = $"{hostname}/HandlePaymentSuccess"
                     },
                     Payer = new Payer()
                     {
                         PaymentMethod = "paypal"
                     }
                 };
+
 
                 PaymentCreateRequest request = new PaymentCreateRequest();
                 request.RequestBody(payment);
@@ -502,69 +531,104 @@ namespace LaptopShop.Controllers
                         paypalRedirectUrl = lnk.Href;
                     }
                 }
-                #region Update vào csdl
-                var accountID = User.Identity.GetAccountID();
-
-                if (!string.IsNullOrEmpty(accountID))
-                {
-                    var khachhang = _context.Users
-                        .AsNoTracking()
-                        .SingleOrDefault(x => x.UserId == accountID);
-
-                    var cartItems = _context.Carts
-                        .Include(c => c.Product)
-                        .Where(c => c.UserId == accountID)
-                        .ToList();
-
-                    if (cartItems.Any())
-                    {
-                        var donhang = new Models.Order
-                        {
-                            UserId = accountID,
-                            Address = khachhang?.Address,
-                            Phone = khachhang?.Phone,
-                            RecipientName = khachhang.FullName,
-                            OrderDate = DateTime.Now,
-                            StatusId = 1,
-                            IsPayment = true,
-                            Total = Convert.ToInt32(cartItems.Sum(x => x.TotalMoney))
-                        };
-
-                        _context.Orders.Add(donhang);
-                        _context.SaveChanges();
-
-                        foreach (var item in cartItems)
-                        {
-                            var orderDetail = new OrderDetail
-                            {
-                                OrderId = donhang.OrderId,
-                                ProductId = item.ProductId,
-                                Quantity = item.Quantity,
-                                Price = item.Product.Price
-                            };
-
-                            _context.OrderDetails.Add(orderDetail);
-
-                            var product = _context.Products.Find(item.ProductId);
-                            product.Instock -= item.Quantity;
-                            _context.Products.Update(product);
-                        }
-
-                        _context.Carts.RemoveRange(cartItems);
-                        _context.SaveChanges();
-                    }
-                }
-                #endregion
-
-                return Redirect(paypalRedirectUrl);
+                return paypalRedirectUrl;
+                //return Redirect(paypalRedirectUrl);
             }
-            catch (HttpException httpException)
+            catch /*(HttpException httpException)*/
             {
-                var statusCode = httpException.StatusCode;
-                var debugId = httpException.Headers.GetValues("PayPal-Debug-Id").FirstOrDefault();
+                return string.Empty;
+                //var statusCode = httpException.StatusCode;
+                //var debugId = httpException.Headers.GetValues("PayPal-Debug-Id").FirstOrDefault();
 
-                return Redirect("/dat-hang-khong-thanh-cong");
+                //return Redirect("/dat-hang-khong-thanh-cong");
             }
         }
+
+        [Route("HandlePaymentSuccess")]
+        public async Task<IActionResult> HandlePaymentSuccess(string paymentId, string token, string PayerID)
+        {
+            var environment = new SandboxEnvironment(_clientId, _clientSecret);
+            var client = new PayPalHttpClient(environment);
+
+            try
+            {
+                // Thực hiện xác nhận thanh toán
+                var paymentExecution = new PaymentExecution() { PayerId = PayerID };
+                var payment = new Payment() { Id = paymentId };
+                var request = new PaymentExecuteRequest(paymentId);
+                request.RequestBody(paymentExecution);
+
+                var response = await client.Execute(request);
+                var statusCode = response.StatusCode;
+
+                if (statusCode == HttpStatusCode.OK)
+                {
+                    // Chỉ cập nhật vào database khi thanh toán thành công
+                    var accountID = User.Identity.GetAccountID();
+                    UpdateDatabaseAfterPayment(accountID);
+
+                    return Redirect("/dat-hang-thanh-cong");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi hoặc xử lý lỗi tại đây
+                Console.WriteLine(ex.Message);
+            }
+
+            return Redirect("/dat-hang-khong-thanh-cong");
+        }
+
+        private void UpdateDatabaseAfterPayment(string accountId)
+        {
+            if (string.IsNullOrEmpty(accountId)) return;
+
+            var khachhang = _context.Users
+                .AsNoTracking()
+                .SingleOrDefault(x => x.UserId == accountId);
+
+            var cartItems = _context.Carts
+                .Include(c => c.Product)
+                .Where(c => c.UserId == accountId && c.Product.Instock > 0)
+                .ToList();
+
+            if (!cartItems.Any()) return;
+
+            var donhang = new Models.Order
+            {
+                UserId = accountId,
+                Address = khachhang?.Address,
+                Phone = khachhang?.Phone,
+                RecipientName = khachhang.FullName,
+                OrderDate = DateTime.Now,
+                StatusId = 1,
+                IsPayment = true,
+                Total = Convert.ToInt32(cartItems.Sum(x => x.TotalMoney))
+            };
+
+            _context.Orders.Add(donhang);
+            _context.SaveChanges();
+
+            foreach (var item in cartItems)
+            {
+                var orderDetail = new OrderDetail
+                {
+                    OrderId = donhang.OrderId,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    Price = item.Product.Price
+                };
+
+                _context.OrderDetails.Add(orderDetail);
+
+                var product = _context.Products.Find(item.ProductId);
+                product.Instock -= item.Quantity;
+                _context.Products.Update(product);
+            }
+
+            _context.Carts.RemoveRange(cartItems);
+            _context.SaveChanges();
+        }
+
     }
 }
